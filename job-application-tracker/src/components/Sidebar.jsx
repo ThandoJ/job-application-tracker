@@ -10,6 +10,11 @@ export default function Sidebar() {
         <li className="cursor-pointer hover:text-gray-300 transition">
           Jobs
         </li>
+         <li
+          onClick={() => navigate("/applications")}
+            className="cursor-pointer hover:text-gray-300">
+          Applications
+       </li>
         <li className="cursor-pointer hover:text-gray-300 transition">
           Profile
         </li>
