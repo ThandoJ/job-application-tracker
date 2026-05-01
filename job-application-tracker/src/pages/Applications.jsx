@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Sidebar from "../components/Sidebar";
+
 
 export default function Applications({ jobs = [], applications = [] }) {
   const navigate = useNavigate();
@@ -14,12 +16,12 @@ export default function Applications({ jobs = [], applications = [] }) {
     return null;
   }
 
-  // 🆕 FILTER USER/APPLICATIONS
+  // FILTER USER/APPLICATIONS
   let filtered = isAdmin
     ? applications
     : applications.filter((app) => app.email === user.email);
 
-  // 🆕 SEARCH (by job title or name)
+  // SEARCH (by job title or name)
   filtered = filtered.filter((app) => {
     const job = jobs.find((j) => j.id === app.jobId);
 
@@ -29,18 +31,25 @@ export default function Applications({ jobs = [], applications = [] }) {
     );
   });
 
-  // 🆕 STATUS FILTER
+  // STATUS FILTER
   if (statusFilter !== "all") {
     filtered = filtered.filter((app) => app.status === statusFilter);
   }
 
-  return (
-    <div className="p-6 bg-gray-100 min-h-screen">
-      <h1 className="text-2xl font-bold mb-4">
-        {isAdmin ? "All Applications" : "My Applications"}
-      </h1>
+ return (
+    <div className="flex"> {/* LAYOUT WRAPPER */}
+      
+      {/* SIDEBAR */}
+      <Sidebar />
 
-      {/* 🆕 SEARCH + FILTER UI */}
+      {/* MAIN CONTENT */}
+      <div className="flex-1 p-6 bg-gray-100 min-h-screen">
+        <h1 className="text-2xl font-bold mb-4">
+          {isAdmin ? "All Applications" : "My Applications"}
+        </h1>
+
+        
+      {/* SEARCH + FILTER  */}
       <div className="flex gap-3 mb-6">
         <input
           type="text"
@@ -57,9 +66,10 @@ export default function Applications({ jobs = [], applications = [] }) {
         >
           <option value="all">All</option>
           <option value="applied">Applied</option>
-          <option value="reviewing">Reviewing</option>
+          <option value="reviewing">Reviewing CV</option>
           <option value="interview">Interview</option>
           <option value="rejected">Rejected</option>
+           <option value="rejected">Accepted</option>
         </select>
       </div>
 
@@ -88,7 +98,7 @@ export default function Applications({ jobs = [], applications = [] }) {
                   </>
                 )}
 
-                {/* 🆕 VIEW CV (BASE64) */}
+                {/* VIEW CV (BASE64) */}
                 <a
                   href={app.cvBase64}
                   target="_blank"
@@ -113,6 +123,7 @@ export default function Applications({ jobs = [], applications = [] }) {
           })}
         </div>
       )}
+    </div>
     </div>
   );
 }

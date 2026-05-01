@@ -23,7 +23,7 @@ export default function JobCard({
 
   const user = JSON.parse(localStorage.getItem("user"));
 
-  // 🆕 FIXED MATCHING (EMAIL)
+  // FIXED MATCHING (EMAIL)
   const myApplication = jobApplications.find(
     (app) => app.email === user?.email
   );
@@ -77,7 +77,7 @@ export default function JobCard({
           </>
         ) : (
           <>
-            {/* 🆕 APPLICANT VIEW FIXED */}
+            {/*APPLICANT VIEW */}
             {myApplication ? (
               <div className="flex flex-col gap-1">
                 <span className="text-green-600 text-sm font-semibold">
