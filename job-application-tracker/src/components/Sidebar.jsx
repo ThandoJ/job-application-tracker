@@ -18,14 +18,17 @@ export default function Sidebar() {
           Dashboard
         </li>
         
-         <li
+         
+        <li
           onClick={() => navigate("/applications")} 
           className="cursor-pointer hover:text-gray-300 transition"
         >
           {isAdmin ? "All Applications" : "My Applications"}
         </li>
          
-        <li className="cursor-pointer hover:text-gray-300 transition">
+        <li 
+         onClick={() => navigate("/profile")}
+         className="cursor-pointer hover:text-gray-300 transition">
           Profile
         </li>
       </ul>

@@ -1,13 +1,15 @@
 import { Routes, Route } from "react-router-dom";
 import { useState, useEffect } from "react";
+
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Applications from "./pages/Applications";
+import Profile from "./pages/Profile";
 import { jobs as initialJobs } from "./data/jobs";
 
 export default function App() {
-   //LOAD FROM LOCAL STORAGE
+  // LOADING FROM LOCAL STORAGE
   const [jobs, setJobs] = useState(() => {
     const saved = localStorage.getItem("jobs");
     return saved ? JSON.parse(saved) : initialJobs;
@@ -18,7 +20,7 @@ export default function App() {
     return saved ? JSON.parse(saved) : [];
   });
 
-  // SAVE TO LOCAL STORAGE
+  //SAVE TO LOCAL STORAGE
   useEffect(() => {
     localStorage.setItem("jobs", JSON.stringify(jobs));
   }, [jobs]);
@@ -29,14 +31,36 @@ export default function App() {
 
   return (
     <Routes>
+      {/* AUTH */}
       <Route path="/" element={<Login />} />
       <Route path="/register" element={<Register />} />
-      <Route path="/dashboard" element={<Dashboard jobs={jobs} setJobs={setJobs} applications={applications}setApplications={setApplications}/>}/>
-      <Route path="/applications"element={<Applications jobs={jobs} applications={applications}/>
-  }
-/>
-      
+
+      {/* DASHBOARD */}
+      <Route
+        path="/dashboard"
+        element={
+          <Dashboard
+            jobs={jobs}
+            setJobs={setJobs}
+            applications={applications}
+            setApplications={setApplications}
+          />
+        }
+      />
+
+      {/* APPLICATIONS */}
+      <Route
+        path="/applications"
+        element={
+          <Applications
+            jobs={jobs}
+            applications={applications}
+          />
+        }
+      />
+
+      {/*PROFILE */}
+      <Route path="/profile" element={<Profile />} />
     </Routes>
   );
 }
-

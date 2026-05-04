@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function ApplyModal({ isOpen, onClose, onSubmit, job }) {
   const [form, setForm] = useState({
@@ -8,6 +8,22 @@ export default function ApplyModal({ isOpen, onClose, onSubmit, job }) {
     cv: null,
     cvBase64: ""
   });
+
+    // LOADING PROFILE INTO A FORM
+  useEffect(() => {
+    const savedProfile = localStorage.getItem("profile");
+
+    if (savedProfile) {
+      const parsed = JSON.parse(savedProfile);
+
+      setForm((prev) => ({
+        ...prev,
+        name: parsed.name || "",
+        surname: parsed.surname || "",
+        phone: parsed.phone || ""
+      }));
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
