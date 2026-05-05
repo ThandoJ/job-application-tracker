@@ -23,7 +23,7 @@ export default function JobCard({
 
   const user = JSON.parse(localStorage.getItem("user"));
 
-  // FIXED MATCHING (EMAIL)
+  //  (EMAIL)
   const myApplication = jobApplications.find(
     (app) => app.email === user?.email
   );

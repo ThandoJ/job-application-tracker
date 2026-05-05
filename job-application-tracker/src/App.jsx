@@ -9,7 +9,7 @@ import Profile from "./pages/Profile";
 import { jobs as initialJobs } from "./data/jobs";
 
 export default function App() {
-  // LOADING FROM LOCAL STORAGE
+  // LOAD FROM LOCAL STORAGE
   const [jobs, setJobs] = useState(() => {
     const saved = localStorage.getItem("jobs");
     return saved ? JSON.parse(saved) : initialJobs;
