@@ -48,7 +48,7 @@ export default function Applications({ jobs = [], applications = [] }) {
           {isAdmin ? "All Applications" : "My Applications"}
         </h1>
 
-        
+
       {/* SEARCH + FILTER  */}
       <div className="flex gap-3 mb-6">
         <input
@@ -99,6 +99,9 @@ export default function Applications({ jobs = [], applications = [] }) {
                 )}
 
                 {/* VIEW CV (BASE64) */}
+
+                {app.cvBase64 ? (
+
                 <a
                   href={app.cvBase64}
                   target="_blank"
@@ -107,6 +110,9 @@ export default function Applications({ jobs = [], applications = [] }) {
                 >
                   View CV
                 </a>
+                ) : (
+  <p className="text-xs text-red-500">No CV uploaded</p>
+)}
 
                 <p className="mt-2">
                   Status:{" "}

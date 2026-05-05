@@ -1,19 +1,32 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function Login() {
   const navigate = useNavigate();
 
-  const handleLogin = () => {
-    // Get saved user from localStorage
-    const user = JSON.parse(localStorage.getItem("user"));
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [role, setRole] = useState("user")
 
-    if (!user) {
-      alert("No account found. Please register first.");
+    const handleLogin = () => {
+    console.log("EMAIL:", email);
+    console.log("PASSWORD:", password);
+
+    if (!email || !password) {
+      alert("Please enter email and password");
       return;
     }
 
+    const user = {
+      email,
+      role
+    };
+
+    localStorage.setItem("user", JSON.stringify(user));
+
     navigate("/dashboard");
   };
+
 
   return (
     <div className="flex items-center justify-center h-screen bg-gray-100">
@@ -24,13 +37,28 @@ export default function Login() {
           type="email"
           placeholder="Email"
           className="w-full mb-3 p-2 border rounded"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
         />
 
         <input
           type="password"
           placeholder="Password"
           className="w-full mb-3 p-2 border rounded"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
         />
+
+         {/*ROLE SELECT */}
+        <select
+          className="w-full mb-4 p-2 border rounded"
+          value={role}
+          onChange={(e) => setRole(e.target.value)}
+        >
+          <option value="user">Applicant</option>
+          <option value="admin">Recruiter</option>
+        </select>
+
 
         <button
           onClick={handleLogin}
