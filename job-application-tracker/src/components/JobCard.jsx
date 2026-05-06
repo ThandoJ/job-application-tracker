@@ -57,6 +57,7 @@ export default function JobCard({
                     <option value="reviewing">Reviewing</option>
                     <option value="interview">Interview</option>
                     <option value="rejected">Rejected</option>
+                     <option value="rejected">Accepted</option>
                   </select>
                 </div>
               ))

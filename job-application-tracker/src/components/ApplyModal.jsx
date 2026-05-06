@@ -101,9 +101,9 @@ export default function ApplyModal({ isOpen, onClose, onSubmit, job }) {
         <input
           type="file"
           className="w-full mb-4"
-          onChange={(e) =>
-            setForm({ ...form, cv: e.target.files[0] })
-          }
+          onChange={handleFileChange}
+           
+          
         />
 
         <div className="flex justify-end gap-2">
