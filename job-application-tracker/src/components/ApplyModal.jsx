@@ -32,13 +32,20 @@ export default function ApplyModal({ isOpen, onClose, onSubmit, job }) {
     const file = e.target.files[0];
 
     if (file) {
-      const reader = new FileReader();
+    const reader = new FileReader();
 
-      reader.onloadend = () => {
-        setForm({
-          ...form,
-          cv: file.name,
-          cvBase64: reader.result // STORE BASE64
+    reader.onloadend = () => {
+      let base64 = reader.result;
+
+      // PDF FORMAT
+      if (!base64.startsWith("data:")) {
+        base64 = `data:${file.type};base64,${base64}`;
+      }
+
+      setForm({
+        ...form,
+        cv: file.name,
+        cvBase64: base64
         });
       };
 

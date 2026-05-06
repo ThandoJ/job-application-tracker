@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
+import CVPreviewModal from "../components/CVPreviewModal";
 
 
 export default function Applications({ jobs = [], applications = [] }) {
@@ -10,6 +11,8 @@ export default function Applications({ jobs = [], applications = [] }) {
 
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [selectedCV, setSelectedCV] = useState(null);
+  const [selectedFileName, setSelectedFileName] = useState("");
 
   if (!user) {
     navigate("/");
@@ -99,17 +102,16 @@ export default function Applications({ jobs = [], applications = [] }) {
                 )}
 
                 {/* VIEW CV (BASE64) */}
-
-                {app.cvBase64 ? (
-
-                <a
-                  href={app.cvBase64}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 underline text-sm"
-                >
-                  View CV
-                </a>
+             {app.cvBase64 ? (
+                 <button
+                      onClick={() => {
+                        setSelectedCV(app.cvBase64);
+                        setSelectedFileName(app.cv);
+                      }}
+                      className="text-blue-600 underline text-sm"
+                    >
+                      View CV
+                    </button>
                 ) : (
   <p className="text-xs text-red-500">No CV uploaded</p>
 )}
@@ -130,6 +132,14 @@ export default function Applications({ jobs = [], applications = [] }) {
         </div>
       )}
     </div>
+
+          {/* CV MODAL */}
+     <CVPreviewModal
+        isOpen={!!selectedCV}
+        cvBase64={selectedCV}
+        fileName={selectedFileName}
+        onClose={() => setSelectedCV(null)}
+      />
     </div>
   );
 }
