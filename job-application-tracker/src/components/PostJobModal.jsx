@@ -1,6 +1,10 @@
 import { useState } from "react";
 
-export default function PostJobModal({ isOpen, onClose, onAddJob }) {
+export default function PostJobModal({
+  isOpen,
+  onClose,
+  onAddJob
+}) {
   const [title, setTitle] = useState("");
   const [company, setCompany] = useState("");
   const [location, setLocation] = useState("");
@@ -19,63 +23,70 @@ export default function PostJobModal({ isOpen, onClose, onAddJob }) {
     };
 
     onAddJob(newJob);
-    onClose();
 
-    // reset form
     setTitle("");
     setCompany("");
     setLocation("");
     setDescription("");
+
+    onClose();
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      {/* Modal */}
-      <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-lg animate-fadeIn">
-        <h2 className="text-xl font-bold mb-4">Post New Job</h2>
+    <div className="fixed inset-0 bg-black/60 z-50 flex justify-center items-center p-4">
+      <div className="bg-white rounded-3xl w-full max-w-lg p-6 animate-fadeIn shadow-2xl">
 
-        <input
-          placeholder="Job Title"
-          className="w-full mb-3 p-2 border rounded"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
+        <h2 className="text-2xl font-bold mb-6">
+          Post New Job
+        </h2>
 
-        <input
-          placeholder="Company"
-          className="w-full mb-3 p-2 border rounded"
-          value={company}
-          onChange={(e) => setCompany(e.target.value)}
-        />
+        <div className="space-y-4">
 
-        <input
-          placeholder="Location"
-          className="w-full mb-3 p-2 border rounded"
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-        />
+          <input
+            placeholder="Job title"
+            className="w-full p-3 border rounded-xl"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
 
-        <textarea
-          placeholder="Description"
-          className="w-full mb-3 p-2 border rounded"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
+          <input
+            placeholder="Company"
+            className="w-full p-3 border rounded-xl"
+            value={company}
+            onChange={(e) => setCompany(e.target.value)}
+          />
 
-        <div className="flex justify-end gap-2">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 bg-gray-300 rounded"
-          >
-            Cancel
-          </button>
+          <input
+            placeholder="Location"
+            className="w-full p-3 border rounded-xl"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+          />
 
-          <button
-            onClick={handleSubmit}
-            className="px-4 py-2 bg-green-500 text-white rounded"
-          >
-            Post
-          </button>
+          <textarea
+            placeholder="Description"
+            rows={4}
+            className="w-full p-3 border rounded-xl"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
+
+          <div className="flex justify-end gap-3">
+            <button
+              onClick={onClose}
+              className="px-5 py-2 rounded-xl bg-gray-200"
+            >
+              Cancel
+            </button>
+
+            <button
+              onClick={handleSubmit}
+              className="px-5 py-2 rounded-xl bg-blue-600 text-white"
+            >
+              Post Job
+            </button>
+          </div>
+
         </div>
       </div>
     </div>

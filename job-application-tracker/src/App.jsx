@@ -6,33 +6,47 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Applications from "./pages/Applications";
 import Profile from "./pages/Profile";
+
+import Chats from "./components/Chats";
+
 import { jobs as initialJobs } from "./data/jobs";
 
 export default function App() {
-  // LOAD FROM LOCAL STORAGE
+
+  // LOAD JOBS FROM LOCAL STORAGE
   const [jobs, setJobs] = useState(() => {
-    const saved = localStorage.getItem("jobs");
-    return saved ? JSON.parse(saved) : initialJobs;
+    const savedJobs = localStorage.getItem("jobs");
+    return savedJobs ? JSON.parse(savedJobs) : initialJobs;
   });
 
+  // LOAD APPLICATIONS FROM LOCAL STORAGE
   const [applications, setApplications] = useState(() => {
-    const saved = localStorage.getItem("applications");
-    return saved ? JSON.parse(saved) : [];
+    const savedApplications = localStorage.getItem("applications");
+    return savedApplications
+      ? JSON.parse(savedApplications)
+      : [];
   });
 
-  //SAVE TO LOCAL STORAGE
+  // SAVE JOBS
   useEffect(() => {
     localStorage.setItem("jobs", JSON.stringify(jobs));
   }, [jobs]);
 
+  // SAVE APPLICATIONS
   useEffect(() => {
-    localStorage.setItem("applications", JSON.stringify(applications));
+    localStorage.setItem(
+      "applications",
+      JSON.stringify(applications)
+    );
   }, [applications]);
 
   return (
     <Routes>
-      {/* AUTH */}
+
+      {/* LOGIN */}
       <Route path="/" element={<Login />} />
+
+      {/* REGISTER */}
       <Route path="/register" element={<Register />} />
 
       {/* DASHBOARD */}
@@ -59,8 +73,18 @@ export default function App() {
         }
       />
 
-      {/*PROFILE */}
-      <Route path="/profile" element={<Profile />} />
+      {/* PROFILE */}
+      <Route
+        path="/profile"
+        element={<Profile />}
+      />
+
+      {/* CHATS */}
+      <Route
+        path="/chats"
+        element={<Chats />}
+      />
+
     </Routes>
   );
 }
