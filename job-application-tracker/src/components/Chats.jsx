@@ -5,6 +5,9 @@ import Sidebar from "../components/Sidebar";
 export default function Chats() {
   const user = JSON.parse(localStorage.getItem("user"));
 
+
+
+
   const [messages, setMessages] = useState(() => {
     const saved = localStorage.getItem("messages");
     return saved ? JSON.parse(saved) : [];

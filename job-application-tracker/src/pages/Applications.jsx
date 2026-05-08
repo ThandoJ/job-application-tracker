@@ -23,6 +23,8 @@ export default function Applications({
   const user = JSON.parse(localStorage.getItem("user"));
   const isAdmin = user?.role === "admin";
 
+
+
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] =
     useState("all");

@@ -4,7 +4,8 @@ import ThemeToggle from "../components/ThemeToggle";
 import { User, Mail, Phone, Save } from "lucide-react";
 
 export default function Profile() {
-  const user = JSON.parse(localStorage.getItem("user"));
+  const user = JSON.parse(localStorage.getItem("user"))
+
 
   const [profile, setProfile] = useState({
     name: "",

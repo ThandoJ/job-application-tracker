@@ -1,18 +1,19 @@
 import ApplyModal from "../components/ApplyModal";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
+
 import Sidebar from "../components/Sidebar";
 import JobCard from "../components/JobCard";
 import PostJobModal from "../components/PostJobModal";
 import Charts from "../components/Charts";
+import NotificationBell from "../components/NotificationBell";
+import ThemeToggle from "../components/ThemeToggle";
 
 import {
   Briefcase,
   FileText,
   Users,
   CheckCircle,
-  Bell,
-  Search,
   TrendingUp
 } from "lucide-react";
 
@@ -28,19 +29,10 @@ export default function Dashboard({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedJob, setSelectedJob] = useState(null);
 
-  const [notifications, setNotifications] = useState([
-    "Welcome back 👋",
-    "New applications received",
-  ]);
-
   const user = JSON.parse(localStorage.getItem("user"));
   const isAdmin = user?.role === "admin";
 
-  useEffect(() => {
-    if (!user) navigate("/");
-  }, [user, navigate]);
-
-  if (!user) return null;
+ 
 
   // LOGOUT
   const handleLogout = () => {
@@ -52,10 +44,21 @@ export default function Dashboard({
   const handleAddJob = (newJob) => {
     setJobs([newJob, ...jobs]);
 
-    setNotifications((prev) => [
-      `New job posted: ${newJob.title}`,
-      ...prev
-    ]);
+    const existing =
+      JSON.parse(localStorage.getItem("notifications")) || [];
+
+    const newNotification = {
+      id: Date.now(),
+      message: `New job posted: ${newJob.title}`,
+      time: new Date().toLocaleString(),
+      status: "posted",
+      read: false
+    };
+
+    localStorage.setItem(
+      "notifications",
+      JSON.stringify([newNotification, ...existing])
+    );
   };
 
   // OPEN APPLY MODAL
@@ -65,9 +68,14 @@ export default function Dashboard({
 
   // SUBMIT APPLICATION
   const handleSubmitApplication = (formData) => {
+    const currentUser = JSON.parse(
+      localStorage.getItem("user")
+    );
+
     const newApplication = {
       jobId: selectedJob.id,
-      email: user?.email,
+      jobTitle: selectedJob.title,
+      email: currentUser?.email,
       name: formData.name,
       surname: formData.surname,
       phone: formData.phone,
@@ -77,40 +85,85 @@ export default function Dashboard({
       appliedAt: new Date().toISOString()
     };
 
-    setApplications([newApplication, ...applications]);
-
-    setNotifications((prev) => [
-      `Application submitted for ${selectedJob.title}`,
-      ...prev
+    setApplications([
+      newApplication,
+      ...applications
     ]);
+
+    const existing =
+      JSON.parse(localStorage.getItem("notifications")) || [];
+
+    const newNotification = {
+      id: Date.now(),
+      message: `Application submitted for ${selectedJob.title}`,
+      time: new Date().toLocaleString(),
+      status: "applied",
+      read: false
+    };
+
+    localStorage.setItem(
+      "notifications",
+      JSON.stringify([newNotification, ...existing])
+    );
 
     setSelectedJob(null);
   };
 
   // STATUS CHANGE
-  const handleStatusChange = (jobId, newStatus) => {
-    const updated = applications.map((app) =>
-      app.jobId === jobId
-        ? { ...app, status: newStatus }
-        : app
-    );
+  const handleStatusChange = (
+    jobId,
+    newStatus
+  ) => {
+
+    const updated = applications.map((app) => {
+      if (app.jobId === jobId) {
+        return {
+          ...app,
+          status: newStatus
+        };
+      }
+
+      return app;
+    });
 
     setApplications(updated);
 
-    setNotifications((prev) => [
-      `Application moved to ${newStatus}`,
-      ...prev
-    ]);
+    const existing =
+      JSON.parse(localStorage.getItem("notifications")) || [];
+
+    const changedApp = applications.find(
+      (a) => a.jobId === jobId
+    );
+
+    if (changedApp) {
+      const newNotification = {
+        id: Date.now(),
+        message: `Your application status changed to ${newStatus}`,
+        time: new Date().toLocaleString(),
+        status: newStatus,
+        read: false
+      };
+
+      localStorage.setItem(
+        "notifications",
+        JSON.stringify([newNotification, ...existing])
+      );
+    }
   };
 
   // FILTER JOBS
-  const filteredJobs = jobs.filter((job) =>
-    job.title.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredJobs = useMemo(() => {
+    return jobs.filter((job) =>
+      job.title
+        .toLowerCase()
+        .includes(search.toLowerCase())
+    );
+  }, [jobs, search]);
 
   // STATS
   const totalJobs = jobs.length;
   const totalApps = applications.length;
+
   const interviews = applications.filter(
     (a) => a.status === "interview"
   ).length;
@@ -119,27 +172,27 @@ export default function Dashboard({
     (a) => a.status === "accepted"
   ).length;
 
-  // DYNAMIC %
-  const applicationRate = useMemo(() => {
-    if (totalJobs === 0) return 0;
-    return Math.round((totalApps / totalJobs) * 100);
-  }, [totalApps, totalJobs]);
+  const applicationRate =
+    totalJobs > 0
+      ? Math.round((totalApps / totalJobs) * 100)
+      : 0;
 
-  const interviewRate = useMemo(() => {
-    if (totalApps === 0) return 0;
-    return Math.round((interviews / totalApps) * 100);
-  }, [interviews, totalApps]);
+  const interviewRate =
+    totalApps > 0
+      ? Math.round((interviews / totalApps) * 100)
+      : 0;
 
-  const acceptedRate = useMemo(() => {
-    if (totalApps === 0) return 0;
-    return Math.round((accepted / totalApps) * 100);
-  }, [accepted, totalApps]);
+  const acceptedRate =
+    totalApps > 0
+      ? Math.round((accepted / totalApps) * 100)
+      : 0;
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
 
-      {/* SIDEBAR */}
-      <Sidebar />
+
+     {/* SIDEBAR */} 
+     <Sidebar />
 
       {/* MAIN */}
       <div className="flex-1 p-4 md:p-6 overflow-hidden">
@@ -151,38 +204,64 @@ export default function Dashboard({
             <h1 className="text-3xl md:text-4xl font-bold">
               {isAdmin
                 ? "Recruiter Dashboard"
-                : "Find Your Dream Job"}
+                : "Job Dashboard"}
             </h1>
 
             <p className="text-slate-400 mt-2">
-              Track jobs, applications and recruitment activity
+              Welcome back, {user?.email}
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
+          {/* RIGHT */}
+          <div className="flex items-center gap-3 flex-wrap">
 
-            {/* NOTIFICATIONS */}
-            <div className="relative">
-              <button className="bg-white/10 backdrop-blur-lg border border-white/10 p-3 rounded-2xl hover:bg-white/20 transition">
-                <Bell size={20} />
-              </button>
+            <ThemeToggle />
 
-              <div className="absolute -top-1 -right-1 bg-blue-500 text-xs w-5 h-5 rounded-full flex items-center justify-center">
-                {notifications.length}
-              </div>
-            </div>
+            <NotificationBell
+              applications={applications}
+            />
 
-            {/* LOGOUT */}
             <button
               onClick={handleLogout}
-              className="bg-red-500 hover:bg-red-600 px-5 py-3 rounded-2xl transition font-medium shadow-lg"
+              className="bg-red-500/20 border border-red-500/30 hover:bg-red-500 px-5 py-3 rounded-2xl transition font-medium"
             >
               Logout
             </button>
+
           </div>
         </div>
 
-        {/* STATS */}
+        {/* SEARCH */}
+        <div className="bg-white/10 backdrop-blur-2xl border border-white/10 rounded-3xl p-4 mb-8">
+
+          <div className="flex flex-col lg:flex-row gap-4">
+
+            <input
+              type="text"
+              placeholder="Search jobs..."
+              value={search}
+              onChange={(e) =>
+                setSearch(e.target.value)
+              }
+              className="flex-1 bg-white/10 border border-white/10 rounded-2xl px-5 py-4 text-white placeholder-gray-400 outline-none"
+            />
+
+            {/* POST BUTTON */}
+            {isAdmin && (
+              <button
+                onClick={() =>
+                  setIsModalOpen(true)
+                }
+                className="bg-blue-600 hover:bg-blue-700 px-6 py-4 rounded-2xl font-semibold transition whitespace-nowrap"
+              >
+                + Post Job
+              </button>
+            )}
+
+          </div>
+        </div>
+
+        {/* STAT CARDS */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mb-8">
 
           {/* TOTAL JOBS */}
@@ -276,37 +355,7 @@ export default function Dashboard({
           <Charts applications={applications} />
         </div>
 
-        {/* SEARCH + POST */}
-        <div className="flex flex-col lg:flex-row gap-4 mb-8">
-
-          {/* SEARCH */}
-          <div className="relative flex-1">
-            <Search
-              className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
-              size={18}
-            />
-
-            <input
-              type="text"
-              placeholder="Search jobs..."
-              className="w-full bg-white/10 border border-white/10 backdrop-blur-lg rounded-2xl py-4 pl-12 pr-4 outline-none focus:ring-2 focus:ring-blue-500"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </div>
-
-          {/* POST JOB */}
-          {isAdmin && (
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="bg-gradient-to-r from-blue-500 to-purple-600 px-6 py-4 rounded-2xl font-semibold shadow-xl hover:scale-[1.02] transition"
-            >
-              + Post Job
-            </button>
-          )}
-        </div>
-
-        {/* JOB GRID */}
+        {/* JOBS */}
         <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6">
 
           {filteredJobs.map((job) => (
@@ -315,7 +364,9 @@ export default function Dashboard({
               job={job}
               isAdmin={isAdmin}
               applications={applications}
-              onApply={() => handleApplyClick(job)}
+              onApply={() =>
+                handleApplyClick(job)
+              }
               onStatusChange={handleStatusChange}
             />
           ))}
@@ -334,20 +385,25 @@ export default function Dashboard({
             </p>
           </div>
         )}
+
       </div>
 
       {/* APPLY MODAL */}
       <ApplyModal
         isOpen={!!selectedJob}
         job={selectedJob}
-        onClose={() => setSelectedJob(null)}
+        onClose={() =>
+          setSelectedJob(null)
+        }
         onSubmit={handleSubmitApplication}
       />
 
       {/* POST JOB MODAL */}
       <PostJobModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() =>
+          setIsModalOpen(false)
+        }
         onAddJob={handleAddJob}
       />
     </div>
