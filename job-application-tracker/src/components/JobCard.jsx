@@ -223,7 +223,7 @@ export default function JobCard({
             ) : (
               <button
                 onClick={onApply}
-                className="w-full py-3 rounded-2xl bg-gradient-to-r from-blue-500 via-cyan-500 to-purple-500 text-white font-semibold shadow-lg hover:scale-[1.02] transition"
+                className="w-full py-3 rounded-2xl bg-gradient-to-r from-blue-700 via-cyan-800 to-blue-900 text-white font-semibold shadow-lg hover:scale-[1.02] transition"
               >
                 Apply Now
               </button>
