@@ -151,6 +151,37 @@ export default function Dashboard({
     }
   };
 
+  // DELETE JOB
+  const handleDeleteJob = (id) => {
+
+    const filtered =
+      jobs.filter(
+        (job) => job.id !== id
+      );
+
+    setJobs(filtered);
+  };
+
+  // EDIT JOB
+  const handleEditJob = (
+    id,
+    updatedData
+  ) => {
+
+    const updated =
+      jobs.map((job) =>
+        job.id === id
+          ? {
+              ...job,
+              ...updatedData
+            }
+          : job
+      );
+
+    setJobs(updated);
+  };
+
+
   // FILTER JOBS
   const filteredJobs = useMemo(() => {
     return jobs.filter((job) =>
@@ -367,6 +398,8 @@ export default function Dashboard({
                 handleApplyClick(job)
               }
               onStatusChange={handleStatusChange}
+              onDelete={handleDeleteJob}
+              onEdit={handleEditJob}   
             />
           ))}
 
@@ -404,7 +437,11 @@ export default function Dashboard({
           setIsModalOpen(false)
         }
         onAddJob={handleAddJob}
-      />
+ />
+
+ 
+
+
     </div>
   );
 }

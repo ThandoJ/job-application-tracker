@@ -25,7 +25,9 @@ export default function JobCard({
   isAdmin,
   applications = [],
   onApply,
-  onStatusChange
+  onStatusChange,
+  onDelete,
+  onEdit
 }) {
   const user = JSON.parse(localStorage.getItem("user"));
 
@@ -143,11 +145,44 @@ export default function JobCard({
                 ))}
 
               </div>
-            ) : (
-              <div className="bg-white/5 rounded-2xl p-4 text-center text-gray-400 text-sm">
-                No applicants yet
-              </div>
-            )}
+           ) : (
+  <div className="bg-white/5 rounded-2xl p-4 text-center text-gray-400 text-sm">
+    No applicants yet
+  </div>
+)}
+
+{/* ADMIN ACTIONS */}
+<div className="flex gap-3 mt-4">
+
+  <button
+    onClick={() => {
+      const newTitle = prompt(
+        "Edit job title",
+        job.title
+      );
+
+      if (!newTitle) return;
+
+      onEdit({
+        ...job,
+        title: newTitle
+      });
+    }}
+
+     className=" flex-1 bg-blue-600/30 border border-blue-500/30 hover:bg-blue-500 px-4 py-2 rounded-xl transition font-medium"
+            
+  >
+    Edit
+  </button>
+
+  <button
+    onClick={() => onDelete(job.id)}
+   className=" flex-1 bg-red-600/30 border border-red-500/30 hover:bg-red-500 px-4 py-2 rounded-xl transition font-medium"
+  >
+    Delete
+  </button>
+
+</div>
           </div>
         ) : (
           <>
