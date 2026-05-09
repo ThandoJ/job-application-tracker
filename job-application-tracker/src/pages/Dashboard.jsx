@@ -7,7 +7,7 @@ import JobCard from "../components/JobCard";
 import PostJobModal from "../components/PostJobModal";
 import Charts from "../components/Charts";
 import NotificationBell from "../components/NotificationBell";
-import ThemeToggle from "../components/ThemeToggle";
+
 
 import {
   Briefcase,
@@ -213,10 +213,8 @@ export default function Dashboard({
           </div>
 
           {/* RIGHT */}
-          <div className="flex items-center gap-3 flex-wrap">
-
-            <ThemeToggle />
-
+          <div className="flex items-center justify-end gap-2 ml-auto"></div>
+         
             <NotificationBell
               applications={applications}
             />
@@ -228,7 +226,7 @@ export default function Dashboard({
               Logout
             </button>
 
-          </div>
+          
         </div>
 
         {/* SEARCH */}
@@ -261,6 +259,7 @@ export default function Dashboard({
           </div>
         </div>
 
+      
         {/* STAT CARDS */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mb-8">
 

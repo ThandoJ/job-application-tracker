@@ -38,8 +38,8 @@ export default function Sidebar() {
 
   return (
     <div className="w-72 min-h-screen bg-white/10 backdrop-blur-xl border-r border-white/20 text-white p-6 hidden md:flex flex-col">
-      <h1 className="text-3xl font-bold mb-10">
-        💼 JobTracker
+      <h1 className="text-4xl font-bold mb-10">
+        Launchora
       </h1>
 
       <div className="space-y-3 flex-1">
@@ -60,7 +60,7 @@ export default function Sidebar() {
       </div>
 
       <p className="text-sm text-gray-300 mt-10">
-        © 2026 JobTracker
+        © 2026 Launchora
       </p>
     </div>
   );

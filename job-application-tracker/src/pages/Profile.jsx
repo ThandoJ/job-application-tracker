@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import Sidebar from "../components/Sidebar";
-import ThemeToggle from "../components/ThemeToggle";
+
 import { User, Mail, Phone, Save } from "lucide-react";
 
 export default function Profile() {
@@ -49,7 +49,7 @@ export default function Profile() {
             </p>
           </div>
 
-          <ThemeToggle />
+        
         </div>
 
         {/* PROFILE CARD */}
