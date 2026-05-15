@@ -75,7 +75,7 @@ export default function ApplyModal({ isOpen, onClose, onSubmit, job }) {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center">
-      <div className="bg-white p-6 rounded-xl w-[400px]">
+      <div className="bg-white text-black p-6 rounded-xl w-[400px]">
         <h2 className="text-xl font-bold mb-4">
           Apply for {job.title}
         </h2>

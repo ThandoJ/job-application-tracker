@@ -4,7 +4,7 @@ import Sidebar from "../components/Sidebar";
 import { User, Mail, Phone, Save } from "lucide-react";
 
 export default function Profile() {
-  const user = JSON.parse(localStorage.getItem("user"))
+  const [user] = useState(() => JSON.parse(localStorage.getItem("user")))
 
 
   const [profile, setProfile] = useState({
@@ -15,20 +15,31 @@ export default function Profile() {
     location: "",
   });
 
-  // LOAD PROFILE
-  useEffect(() => {
-    const savedProfile = localStorage.getItem("profile");
+ // LOAD PROFILE
+useEffect(() => {
 
-    if (savedProfile) {
-      setProfile(JSON.parse(savedProfile));
-    }
-  }, []);
+  if (!user?.email) return;
 
-  // SAVE PROFILE
-  const handleSave = () => {
-    localStorage.setItem("profile", JSON.stringify(profile));
-    alert("Profile saved successfully!");
-  };
+  const savedProfile = localStorage.getItem(
+    `profile-${user.email}`
+  );
+
+  if (savedProfile) {
+    setProfile(JSON.parse(savedProfile));
+  }
+
+}, [user?.email]);
+
+// SAVE PROFILE
+const handleSave = () => {
+
+  localStorage.setItem(
+    `profile-${user.email}`,
+    JSON.stringify(profile)
+  );
+
+  alert("Profile saved successfully!");
+};
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">

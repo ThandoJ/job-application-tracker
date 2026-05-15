@@ -291,8 +291,11 @@ export default function Dashboard({
         </div>
 
       
+     
         {/* STAT CARDS */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mb-8">
+          
+          
 
           {/* TOTAL JOBS */}
           <div className="bg-white/10 backdrop-blur-xl border border-white/10 rounded-3xl p-5 shadow-xl">
@@ -315,6 +318,7 @@ export default function Dashboard({
               {totalJobs}
             </p>
           </div>
+
 
           {/* APPLICATIONS */}
           <div className="bg-white/10 backdrop-blur-xl border border-white/10 rounded-3xl p-5 shadow-xl">

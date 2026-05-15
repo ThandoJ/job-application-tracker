@@ -34,7 +34,7 @@ export default function PostJobModal({
 
   return (
     <div className="fixed inset-0 bg-black/60 z-50 flex justify-center items-center p-4">
-      <div className="bg-white rounded-3xl w-full max-w-lg p-6 animate-fadeIn shadow-2xl">
+      <div className="bg-white rounded-3xl text-black w-full max-w-lg p-6 animate-fadeIn shadow-2xl">
 
         <h2 className="text-2xl font-bold mb-6">
           Post New Job
