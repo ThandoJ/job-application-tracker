@@ -8,6 +8,7 @@ import Applications from "./pages/Applications";
 import Profile from "./pages/Profile";
 
 import Chats from "./components/Chats";
+import Interviews from "./pages/Interviews";
 
 import { jobs as initialJobs } from "./data/jobs";
 
@@ -21,12 +22,14 @@ export default function App() {
 
   // LOAD APPLICATIONS FROM LOCAL STORAGE
   const [applications, setApplications] = useState(() => {
-    const savedApplications = localStorage.getItem("applications");
-    return savedApplications
-      ? JSON.parse(savedApplications)
-      : [];
-  });
 
+  const savedApplications =
+    localStorage.getItem("applications");
+
+  return savedApplications
+    ? JSON.parse(savedApplications)
+    : [];
+});
   // SAVE JOBS
   useEffect(() => {
     localStorage.setItem("jobs", JSON.stringify(jobs));
@@ -72,6 +75,9 @@ export default function App() {
           />
         }
       />
+
+     {/* INTERVIEWS */}
+      <Route path="/interviews" element={<Interviews applications={applications}  jobs={jobs} />} />
 
       {/* PROFILE */}
       <Route

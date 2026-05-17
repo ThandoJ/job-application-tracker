@@ -75,6 +75,7 @@ export default function Dashboard({
     const newApplication = {
       jobId: selectedJob.id,
       jobTitle: selectedJob.title,
+      company: selectedJob.company,
       email: currentUser?.email,
       name: formData.name,
       surname: formData.surname,
@@ -116,17 +117,45 @@ export default function Dashboard({
   ) => {
 
     const updated = applications.map((app) => {
+
       if (app.jobId === jobId) {
-        return {
-          ...app,
-          status: newStatus
-        };
+       
+      // CREATE INTERVIEW DATE
+      let interviewDate = app.interviewDate;
+
+      if (
+        newStatus === "interview" &&
+        !app.interviewDate
+      ) {
+
+        const date = new Date();
+
+        // ADD 3 DAYS
+        date.setDate(date.getDate() + 3);
+
+        // SET TIME
+        date.setHours(10);
+        date.setMinutes(0);
+
+        interviewDate = date.toISOString();
       }
 
-      return app;
-    });
+      return {
+        ...app,
+        status: newStatus,
+        interviewDate
+      };
+    }
+
+    return app;
+  });
 
     setApplications(updated);
+
+localStorage.setItem(
+  "applications",
+  JSON.stringify(updated)
+);
 
     const existing =
       JSON.parse(localStorage.getItem("notifications")) || [];
@@ -290,7 +319,9 @@ export default function Dashboard({
           </div>
         </div>
 
-      
+      {user?.role === "admin" && (
+
+  <>
      
         {/* STAT CARDS */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mb-8">
@@ -388,6 +419,10 @@ export default function Dashboard({
         <div className="mb-8">
           <Charts applications={applications} />
         </div>
+
+      </>
+
+)}
 
         {/* JOBS */}
         <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6">

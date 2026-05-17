@@ -3,7 +3,8 @@ import {
   LayoutDashboard,
   BriefcaseBusiness,
   User,
-  MessageSquare
+  MessageSquare,
+  CalendarDays
 } from "lucide-react";
 
 export default function Sidebar() {
@@ -25,15 +26,25 @@ export default function Sidebar() {
       path: "/applications"
     },
     {
+        name: "Interviews",
+        icon: <CalendarDays size={20} />,
+        path: "/interviews"
+  },
+   {
       name: "Chats",
       icon: <MessageSquare size={20} />,
       path: "/chats"
     },
+
+    ...(!isAdmin
+    ? [
     {
       name: "Profile",
       icon: <User size={20} />,
       path: "/profile"
     }
+  ]
+     : [])
   ];
 
   return (
