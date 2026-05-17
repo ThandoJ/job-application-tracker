@@ -1,82 +1,179 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+import { loginUser } from "../api/authApi";
+
+
 export default function Login() {
+
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [role, setRole] = useState("user")
+  const [email, setEmail] =
+    useState("");
 
-    const handleLogin = () => {
-    console.log("EMAIL:", email);
-    console.log("PASSWORD:", password);
+  const [password, setPassword] =
+    useState("");
 
-    if (!email || !password) {
-      alert("Please enter email and password");
-      return;
-    }
+  const [role, setRole] =
+    useState("user");
 
-    const user = {
-      email,
-      role
-    };
+  const handleLogin = async () => {
 
-    localStorage.setItem("user", JSON.stringify(user));
+    if (!email || !password) { 
+      alert("Please enter email and password"); 
+      return; 
+    } 
+    try { 
+      
+      const data = await loginUser({
+         email, 
+         password
+         }); 
+         
+         if (data.message) { 
+          alert(data.message); 
+          return; 
+        } 
+        
+        localStorage.setItem(
+          "token",
+           data.token
+          ); 
+          
+          localStorage.setItem(
+            "user", JSON.stringify(data.user)
+          );
+          
+          navigate("/dashboard"); 
+        } catch (error) { 
 
-    navigate("/dashboard");
+          alert("Login failed"); 
+          
+          console.log(error); 
+        }
   };
 
-
   return (
-    <div className="flex items-center justify-center h-screen bg-gray-100">
-      <div className="bg-white p-6 rounded-xl shadow-md w-80">
-        <h1 className="text-2xl font-bold mb-4 text-center">Login</h1>
 
-        <input
-          type="email"
-          placeholder="Email"
-          className="w-full mb-3 p-2 border rounded"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 px-4 relative overflow-hidden">
 
-        <input
-          type="password"
-          placeholder="Password"
-          className="w-full mb-3 p-2 border rounded"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+      {/* BACKGROUND GLOW */}
+      <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-cyan-500/10 blur-3xl opacity-40" />
 
-         {/*ROLE SELECT */}
-        <select
-          className="w-full mb-4 p-2 border rounded"
-          value={role}
-          onChange={(e) => setRole(e.target.value)}
-        >
-          <option value="user">Applicant</option>
-          <option value="admin">Recruiter</option>
-        </select>
+      {/* LOGIN CARD */}
+      <div className="relative z-10 w-full max-w-md bg-white/10 backdrop-blur-2xl border border-white/10 rounded-3xl p-8 shadow-2xl">
 
+        {/* HEADER */}
+        <div className="text-center mb-8">
 
+          <h1 className="text-4xl font-bold text-white">
+            Launchora
+          </h1>
+
+          <p className="text-slate-400 mt-2">
+            Welcome back
+          </p>
+
+        </div>
+
+        {/* EMAIL */}
+        <div className="mb-4">
+
+          <label className="text-sm text-slate-300 mb-2 block">
+            Email
+          </label>
+
+          <input
+            type="email"
+            autoComplete="off"
+            placeholder="Enter your email"
+            value={email}
+            onChange={(e) =>
+              setEmail(e.target.value)
+            }
+            className="w-full bg-white/10 border border-white/10 rounded-2xl px-5 py-4 text-white placeholder:text-slate-500 outline-none focus:ring-2 focus:ring-blue-500"
+          />
+
+        </div>
+
+        {/* PASSWORD */}
+        <div className="mb-4">
+
+          <label className="text-sm text-slate-300 mb-2 block">
+            Password
+          </label>
+
+          <input
+            type="password"
+            autoComplete="new-password"
+            placeholder="Enter your password"
+            value={password}
+            onChange={(e) =>
+              setPassword(e.target.value)
+            }
+            className="w-full bg-white/10 border border-white/10 rounded-2xl px-5 py-4 text-white placeholder:text-slate-500 outline-none focus:ring-2 focus:ring-blue-500"
+          />
+
+        </div>
+
+        {/* ROLE */}
+        <div className="mb-6">
+
+          <label className="text-sm text-slate-300 mb-2 block">
+            Account Type
+          </label>
+
+          <select
+            value={role}
+            onChange={(e) =>
+              setRole(e.target.value)
+            }
+            className="w-full bg-white/10 border border-white/10 rounded-2xl px-5 py-4 text-white outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option
+              value="user"
+              className="bg-slate-900"
+            >
+              Applicant
+            </option>
+
+            <option
+              value="admin"
+              className="bg-slate-900"
+            >
+              Recruiter
+            </option>
+
+          </select>
+
+        </div>
+
+        {/* BUTTON */}
         <button
           onClick={handleLogin}
-          className="w-full bg-blue-500 text-white p-2 rounded"
+          className="w-full bg-blue-600 hover:bg-blue-700 py-4 rounded-2xl font-semibold transition-all duration-300 shadow-lg hover:scale-[1.02]"
         >
           Login
         </button>
 
-        <p className="mt-3 text-sm text-center">
+        {/* REGISTER */}
+        <p className="text-center text-slate-400 mt-6">
+
           Don’t have an account?{" "}
+
           <span
-            className="text-blue-500 cursor-pointer"
-            onClick={() => navigate("/register")}
+            onClick={() =>
+              navigate("/register")
+            }
+            className="text-blue-400 hover:text-blue-300 cursor-pointer font-medium"
           >
             Register
           </span>
+
         </p>
+
       </div>
     </div>
   );
 }
+

@@ -1,4 +1,4 @@
-import supabase from "../supabase.js";
+import supabase from "../config/supabase.js";
 
 export const getJobs = async (req, res) => {
   try {

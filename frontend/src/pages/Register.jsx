@@ -1,62 +1,173 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+import { registerUser } from "../api/authApi";
+
+
+
 export default function Register() {
+
   const navigate = useNavigate();
-  const [role, setRole] = useState("user");
 
-  const handleRegister = () => {
-    const newUser = {
-      role,
-    };
+  const [email, setEmail] =
+    useState("");
 
-    localStorage.setItem("user", JSON.stringify(newUser));
-    alert("Account created! Please login.");
+  const [password, setPassword] =
+    useState("");
+
+  const [role, setRole] =
+    useState("user");
+
+ 
+const handleRegister = async () => {
+  try {
+
+    if (!email || !password) {
+      alert("Please fill in all fields");
+      return;
+    }
+
+    await registerUser({
+      email,
+      password,
+      role
+    });
+
+    alert("Account created successfully!");
+
     navigate("/");
-  };
+
+  } catch (error) {
+    console.error(error);
+
+    alert(
+      error.response?.data?.message ||
+      "Registration failed"
+    );
+  }
+};
+
+
 
   return (
-    <div className="flex items-center justify-center h-screen bg-gray-100">
-      <div className="bg-white p-6 rounded-xl shadow-md w-80">
-        <h1 className="text-2xl font-bold mb-4 text-center">Register</h1>
 
-        <input
-          type="email"
-          placeholder="Email"
-          className="w-full mb-3 p-2 border rounded"
-        />
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 px-4 relative overflow-hidden">
 
-        <input
-          type="password"
-          placeholder="Password"
-          className="w-full mb-3 p-2 border rounded"
-        />
+      {/* BACKGROUND GLOW */}
+      <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-cyan-500/10 blur-3xl opacity-40" />
 
-        <select
-          className="w-full mb-3 p-2 border rounded"
-          onChange={(e) => setRole(e.target.value)}
-        >
-          <option value="user">Applicant</option>
-          <option value="admin">Recruiter (Admin)</option>
-        </select>
+      {/* CARD */}
+      <div className="relative z-10 w-full max-w-md bg-white/10 backdrop-blur-2xl border border-white/10 rounded-3xl p-8 shadow-2xl">
 
+        {/* HEADER */}
+        <div className="text-center mb-8">
+
+          <h1 className="text-4xl font-bold text-white">
+            Launchora
+          </h1>
+
+          <p className="text-slate-400 mt-2">
+            Create your account
+          </p>
+
+        </div>
+
+        {/* EMAIL */}
+        <div className="mb-4">
+
+          <label className="text-sm text-slate-300 mb-2 block">
+            Email
+          </label>
+
+          <input
+            type="email"
+            placeholder="Enter your email"
+            value={email}
+            onChange={(e) =>
+              setEmail(e.target.value)
+            }
+            className="w-full bg-white/10 border border-white/10 rounded-2xl px-5 py-4 text-white placeholder:text-slate-500 outline-none focus:ring-2 focus:ring-blue-500"
+          />
+
+        </div>
+
+        {/* PASSWORD */}
+        <div className="mb-4">
+
+          <label className="text-sm text-slate-300 mb-2 block">
+            Password
+          </label>
+
+          <input
+            type="password"
+            placeholder="Create password"
+            value={password}
+            onChange={(e) =>
+              setPassword(e.target.value)
+            }
+            className="w-full bg-white/10 border border-white/10 rounded-2xl px-5 py-4 text-white placeholder:text-slate-500 outline-none focus:ring-2 focus:ring-blue-500"
+          />
+
+        </div>
+
+        {/* ROLE */}
+        <div className="mb-6">
+
+          <label className="text-sm text-slate-300 mb-2 block">
+            Account Type
+          </label>
+
+          <select
+            value={role}
+            onChange={(e) =>
+              setRole(e.target.value)
+            }
+            className="w-full bg-white/10 border border-white/10 rounded-2xl px-5 py-4 text-white outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option
+              value="user"
+              className="bg-slate-900"
+            >
+              Applicant
+            </option>
+
+            <option
+              value="admin"
+              className="bg-slate-900"
+            >
+              Recruiter
+            </option>
+
+          </select>
+
+        </div>
+
+        {/* BUTTON */}
         <button
           onClick={handleRegister}
-          className="w-full bg-green-500 text-white p-2 rounded"
+          className="w-full bg-blue-600 hover:bg-blue-700 py-4 rounded-2xl font-semibold transition-all duration-300 shadow-lg hover:scale-[1.02]"
         >
           Create Account
         </button>
 
-        <p className="mt-3 text-sm text-center">
+        {/* LOGIN */}
+        <p className="text-center text-slate-400 mt-6">
+
           Already have an account?{" "}
+
           <span
-            className="text-blue-500 cursor-pointer"
-            onClick={() => navigate("/")}
+            onClick={() =>
+              navigate("/")
+            }
+            className="text-blue-400 hover:text-blue-300 cursor-pointer font-medium"
           >
             Login
           </span>
+
         </p>
+
       </div>
     </div>
   );
 }
+

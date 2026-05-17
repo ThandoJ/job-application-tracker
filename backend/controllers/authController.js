@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import supabase from "../supabase.js";
+import supabase from "../config/supabase.js";
 
 export const register = async (req, res) => {
   try {
@@ -48,12 +48,22 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
+    console.log("Login attempt:", email, password);
 
-    const { data: user } = await supabase
+    const { data: user, error } = await supabase
       .from("users")
       .select("*")
       .eq("email", email)
       .single();
+
+       console.log("Supabase user:", user, "error:", error);
+
+    if (error) {
+      console.error("Error fetching user:", error);
+      return res.status(500).json({
+        message: "Error fetching user"
+      });
+    }
 
     if (!user) {
       return res.status(400).json({
