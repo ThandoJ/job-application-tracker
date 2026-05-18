@@ -44,7 +44,7 @@ export default function Login() {
             "user", JSON.stringify(data.user)
           );
           
-          navigate("/dashboard"); 
+          navigate("/intro"); 
         } catch (error) { 
 
           alert("Login failed"); 

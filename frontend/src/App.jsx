@@ -10,6 +10,9 @@ import Profile from "./pages/Profile";
 
 import Chats from "./components/Chats";
 import Interviews from "./pages/Interviews";
+import Intro from "./pages/Intro";
+
+
 
 import { getJobs } from "./api/jobApi";
 import { fetchApplications } from "./api/applicationApi";
@@ -83,6 +86,11 @@ export default function App() {
         path="/"
         element={<Login />}
       />
+ 
+       {/* INTRO */}
+      <Route 
+      path="/intro" 
+      element={<Intro />} />
 
       {/* REGISTER */}
       <Route
