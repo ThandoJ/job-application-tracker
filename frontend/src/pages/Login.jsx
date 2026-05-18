@@ -116,37 +116,7 @@ export default function Login() {
 
         </div>
 
-        {/* ROLE */}
-        <div className="mb-6">
-
-          <label className="text-sm text-slate-300 mb-2 block">
-            Account Type
-          </label>
-
-          <select
-            value={role}
-            onChange={(e) =>
-              setRole(e.target.value)
-            }
-            className="w-full bg-white/10 border border-white/10 rounded-2xl px-5 py-4 text-white outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option
-              value="user"
-              className="bg-slate-900"
-            >
-              Applicant
-            </option>
-
-            <option
-              value="admin"
-              className="bg-slate-900"
-            >
-              Recruiter
-            </option>
-
-          </select>
-
-        </div>
+        
 
         {/* BUTTON */}
         <button
