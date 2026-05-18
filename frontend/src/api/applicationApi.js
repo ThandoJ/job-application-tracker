@@ -1,4 +1,3 @@
-
 import axios from "axios";
 
 const API =
@@ -7,6 +6,7 @@ const API =
 // GET APPLICATIONS
 export const fetchApplications =
   async () => {
+
     const response =
       await axios.get(API);
 
@@ -16,6 +16,7 @@ export const fetchApplications =
 // CREATE APPLICATION
 export const createApplication =
   async (applicationData) => {
+
     const response =
       await axios.post(
         API,
@@ -27,13 +28,13 @@ export const createApplication =
 
 // UPDATE STATUS
 export const updateApplicationStatus =
-  async (id, status) => {
+  async (id, updatedData) => {
+
     const response =
       await axios.put(
         `${API}/${id}`,
-        { status }
+        updatedData
       );
 
     return response.data;
   };
-

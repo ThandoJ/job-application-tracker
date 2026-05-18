@@ -1,3 +1,4 @@
+
 import {
   Briefcase,
   MapPin,
@@ -29,17 +30,22 @@ export default function JobCard({
   onDelete,
   onEdit
 }) {
-  const user = JSON.parse(localStorage.getItem("user"));
+  const user = JSON.parse(
+    localStorage.getItem("user")
+  );
 
   // JOB APPLICATIONS
-  const jobApplications = applications.filter(
-    (app) => app.jobId === job.id
-  );
+  const jobApplications =
+    applications.filter(
+      (app) => app.jobId === job.id
+    );
 
   // MY APPLICATION
-  const myApplication = jobApplications.find(
-    (app) => app.email === user?.email
-  );
+  const myApplication =
+    jobApplications.find(
+      (app) =>
+        app.email === user?.email
+    );
 
   return (
     <div className="group relative overflow-hidden bg-white/10 backdrop-blur-2xl border border-white/10 rounded-3xl p-6 shadow-xl hover:scale-[1.02] hover:border-blue-500/30 transition-all duration-300">
@@ -99,6 +105,7 @@ export default function JobCard({
                     key={index}
                     className="bg-white/5 border border-white/5 rounded-2xl p-3"
                   >
+
                     <p className="text-white font-medium text-sm">
                       {app.name} {app.surname}
                     </p>
@@ -115,7 +122,7 @@ export default function JobCard({
                       value={app.status}
                       onChange={(e) =>
                         onStatusChange(
-                          job.id,
+                          app.id,
                           e.target.value
                         )
                       }
@@ -141,51 +148,61 @@ export default function JobCard({
                         Rejected
                       </option>
                     </select>
+
+                    {app.interviewDate && (
+                      <div className="mt-3 text-sm text-yellow-400">
+                        Interview:{" "}
+                        {new Date(
+                          app.interviewDate
+                        ).toLocaleString()}
+                      </div>
+                    )}
+
                   </div>
                 ))}
 
               </div>
-           ) : (
-  <div className="bg-white/5 rounded-2xl p-4 text-center text-gray-400 text-sm">
-    No applicants yet
-  </div>
-)}
+            ) : (
+              <div className="bg-white/5 rounded-2xl p-4 text-center text-gray-400 text-sm">
+                No applicants yet
+              </div>
+            )}
 
-{/* ADMIN ACTIONS */}
-<div className="flex gap-3 mt-4">
+            {/* ADMIN ACTIONS */}
+            <div className="flex gap-3 mt-4">
 
-  <button
-    onClick={() => {
-      const newTitle = prompt(
-        "Edit job title",
-        job.title
-      );
+              <button
+                onClick={() => {
+                  const newTitle = prompt(
+                    "Edit job title",
+                    job.title
+                  );
 
-      if (!newTitle) return;
+                  if (!newTitle) return;
 
-      onEdit(
-        job.id,
-        {
-        ...job,
-        title: newTitle
-      }
-    );
-    }}
+                  onEdit(
+                    job.id,
+                    {
+                      ...job,
+                      title: newTitle
+                    }
+                  );
+                }}
+                className="flex-1 bg-blue-600/30 border border-blue-500/30 hover:bg-blue-500 px-4 py-2 rounded-xl transition font-medium"
+              >
+                Edit
+              </button>
 
-     className=" flex-1 bg-blue-600/30 border border-blue-500/30 hover:bg-blue-500 px-4 py-2 rounded-xl transition font-medium"
-            
-  >
-    Edit
-  </button>
+              <button
+                onClick={() =>
+                  onDelete(job.id)
+                }
+                className="flex-1 bg-red-600/30 border border-red-500/30 hover:bg-red-500 px-4 py-2 rounded-xl transition font-medium"
+              >
+                Delete
+              </button>
 
-  <button
-    onClick={() => onDelete(job.id)}
-   className=" flex-1 bg-red-600/30 border border-red-500/30 hover:bg-red-500 px-4 py-2 rounded-xl transition font-medium"
-  >
-    Delete
-  </button>
-
-</div>
+            </div>
           </div>
         ) : (
           <>
@@ -211,6 +228,15 @@ export default function JobCard({
                   >
                     {myApplication.status.toUpperCase()}
                   </p>
+
+                  {myApplication.interviewDate && (
+                    <p className="text-xs text-yellow-400 mt-2">
+                      Interview:{" "}
+                      {new Date(
+                        myApplication.interviewDate
+                      ).toLocaleString()}
+                    </p>
+                  )}
                 </div>
 
                 <div className="text-right">
@@ -238,7 +264,10 @@ export default function JobCard({
         <div className="flex items-center gap-2 mt-5 text-xs text-gray-500">
           <Clock3 size={14} />
           <span>
-            Posted {getDaysAgo(job.createdAt)}
+            Posted{" "}
+            {getDaysAgo(
+              job.createdAt
+            )}
           </span>
         </div>
 
@@ -246,3 +275,4 @@ export default function JobCard({
     </div>
   );
 }
+
