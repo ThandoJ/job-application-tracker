@@ -1,68 +1,46 @@
+
 import axios from "axios";
 
-const API =
-  "http://localhost:5000/api/jobs";
+const API = "http://localhost:5000/api/jobs";
 
-// GET ALL JOBS
+// GET JOBS
 export const getJobs = async () => {
   const response = await axios.get(API);
-
   return response.data;
 };
 
 // CREATE JOB
-export const createJob = async (
-  jobData,
-  token
-) => {
-
+export const createJob = async (jobData) => {
   const response = await axios.post(
     API,
-    jobData,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    }
+    jobData
   );
 
   return response.data;
 };
 
 // DELETE JOB
-export const deleteJob = async (
-  id,
-  token
-) => {
-
+export const deleteJob = async (id) => {
   const response = await axios.delete(
-    `${API}/${id}`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    }
+    `${API}/${id}`
   );
 
   return response.data;
 };
 
-// UPDATE JOB
-export const updateJob = async (
+// EDIT JOB
+export const editJob = async (
   id,
-  updatedData,
-  token
+  updatedData
 ) => {
+
+  console.log("EDIT DATA:", updatedData);
 
   const response = await axios.put(
     `${API}/${id}`,
-    updatedData,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    }
+    updatedData
   );
 
   return response.data;
 };
+

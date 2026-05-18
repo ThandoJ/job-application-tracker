@@ -1,3 +1,4 @@
+
 import { Routes, Route } from "react-router-dom";
 import { useState, useEffect } from "react";
 
@@ -10,47 +11,84 @@ import Profile from "./pages/Profile";
 import Chats from "./components/Chats";
 import Interviews from "./pages/Interviews";
 
-import { jobs as initialJobs } from "./data/jobs";
+import { getJobs } from "./api/jobApi";
+import { fetchApplications } from "./api/applicationApi";
 
 export default function App() {
 
-  // LOAD JOBS FROM LOCAL STORAGE
-  const [jobs, setJobs] = useState(() => {
-    const savedJobs = localStorage.getItem("jobs");
-    return savedJobs ? JSON.parse(savedJobs) : initialJobs;
-  });
+  const [jobs, setJobs] = useState([]);
 
-  // LOAD APPLICATIONS FROM LOCAL STORAGE
-  const [applications, setApplications] = useState(() => {
+  const [applications, setApplications] =
+    useState([]);
 
-  const savedApplications =
-    localStorage.getItem("applications");
-
-  return savedApplications
-    ? JSON.parse(savedApplications)
-    : [];
-});
-  // SAVE JOBS
+  // FETCH JOBS
   useEffect(() => {
-    localStorage.setItem("jobs", JSON.stringify(jobs));
-  }, [jobs]);
 
-  // SAVE APPLICATIONS
+    const loadJobs = async () => {
+
+      try {
+
+        const data =
+          await getJobs();
+
+        setJobs(data);
+
+      } catch (error) {
+
+        console.error(
+          "Failed to fetch jobs",
+          error
+        );
+
+      }
+    };
+
+    loadJobs();
+
+  }, []);
+
+  // FETCH APPLICATIONS
   useEffect(() => {
-    localStorage.setItem(
-      "applications",
-      JSON.stringify(applications)
-    );
-  }, [applications]);
+
+    const loadApplications =
+      async () => {
+
+      try {
+
+        const data =
+          await fetchApplications();
+
+        setApplications(data);
+
+      } catch (error) {
+
+        console.error(
+          "Failed to fetch applications",
+          error
+        );
+
+      }
+    };
+
+    loadApplications();
+
+  }, []);
 
   return (
+
     <Routes>
 
       {/* LOGIN */}
-      <Route path="/" element={<Login />} />
+      <Route
+        path="/"
+        element={<Login />}
+      />
 
       {/* REGISTER */}
-      <Route path="/register" element={<Register />} />
+      <Route
+        path="/register"
+        element={<Register />}
+      />
 
       {/* DASHBOARD */}
       <Route
@@ -60,7 +98,9 @@ export default function App() {
             jobs={jobs}
             setJobs={setJobs}
             applications={applications}
-            setApplications={setApplications}
+            setApplications={
+              setApplications
+            }
           />
         }
       />
@@ -71,13 +111,25 @@ export default function App() {
         element={
           <Applications
             jobs={jobs}
-            applications={applications}
+            applications={
+              applications
+            }
           />
         }
       />
 
-     {/* INTERVIEWS */}
-      <Route path="/interviews" element={<Interviews applications={applications}  jobs={jobs} />} />
+      {/* INTERVIEWS */}
+      <Route
+        path="/interviews"
+        element={
+          <Interviews
+            applications={
+              applications
+            }
+            jobs={jobs}
+          />
+        }
+      />
 
       {/* PROFILE */}
       <Route
@@ -94,3 +146,4 @@ export default function App() {
     </Routes>
   );
 }
+

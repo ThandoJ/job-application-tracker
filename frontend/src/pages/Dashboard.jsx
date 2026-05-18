@@ -1,13 +1,13 @@
+
 import ApplyModal from "../components/ApplyModal";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import Sidebar from "../components/Sidebar";
 import JobCard from "../components/JobCard";
 import PostJobModal from "../components/PostJobModal";
 import Charts from "../components/Charts";
 import NotificationBell from "../components/NotificationBell";
-
 
 import {
   Briefcase,
@@ -17,242 +17,335 @@ import {
   TrendingUp
 } from "lucide-react";
 
+import {
+  createJob,
+  deleteJob,
+  editJob
+} from "../api/jobApi";
+
+import {
+  createApplication,
+  updateApplicationStatus
+} from "../api/applicationApi";
+
 export default function Dashboard({
   jobs = [],
   setJobs,
   applications = [],
   setApplications
 }) {
+
   const navigate = useNavigate();
 
   const [search, setSearch] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedJob, setSelectedJob] = useState(null);
+  const [isModalOpen, setIsModalOpen] =
+    useState(false);
 
-  const user = JSON.parse(localStorage.getItem("user"));
-  const isAdmin = user?.role === "admin";
+  const [selectedJob, setSelectedJob] =
+    useState(null);
 
- 
+  const user = JSON.parse(
+    localStorage.getItem("user")
+  );
+
+  const token =
+    localStorage.getItem("token");
+
+  const isAdmin =
+    user?.role === "admin";
 
   // LOGOUT
   const handleLogout = () => {
+
     localStorage.removeItem("user");
+    localStorage.removeItem("token");
+
     navigate("/");
   };
 
   // ADD JOB
-  const handleAddJob = (newJob) => {
-    setJobs([newJob, ...jobs]);
+  const handleAddJob = async (
+    newJob
+  ) => {
 
-    const existing =
-      JSON.parse(localStorage.getItem("notifications")) || [];
+    try {
 
-    const newNotification = {
-      id: Date.now(),
-      message: `New job posted: ${newJob.title}`,
-      time: new Date().toLocaleString(),
-      status: "posted",
-      read: false
-    };
+      const createdJob =
+        await createJob(
+          newJob,
+          token
+        );
 
-    localStorage.setItem(
-      "notifications",
-      JSON.stringify([newNotification, ...existing])
-    );
+      setJobs([
+        createdJob,
+        ...jobs
+      ]);
+
+      setIsModalOpen(false);
+
+    } catch (error) {
+
+      console.log(error);
+
+      alert(
+        "Failed to create job"
+      );
+    }
   };
 
   // OPEN APPLY MODAL
-  const handleApplyClick = (job) => {
+  const handleApplyClick = (
+    job
+  ) => {
     setSelectedJob(job);
   };
 
   // SUBMIT APPLICATION
-  const handleSubmitApplication = (formData) => {
-    const currentUser = JSON.parse(
-      localStorage.getItem("user")
-    );
+  const handleSubmitApplication =
+    async (formData) => {
 
-    const newApplication = {
-      jobId: selectedJob.id,
-      jobTitle: selectedJob.title,
-      company: selectedJob.company,
-      email: currentUser?.email,
-      name: formData.name,
-      surname: formData.surname,
-      phone: formData.phone,
-      cv: formData.cv,
-      cvBase64: formData.cvBase64,
-      status: "applied",
-      appliedAt: new Date().toISOString()
+      try {
+
+        const currentUser =
+          JSON.parse(
+            localStorage.getItem("user")
+          );
+
+        const newApplication = {
+          jobId: selectedJob.id,
+          jobTitle: selectedJob.title,
+          company: selectedJob.company,
+          email: currentUser?.email,
+          name: formData.name,
+          surname: formData.surname,
+          phone: formData.phone,
+          cv: formData.cv,
+          cvBase64:
+            formData.cvBase64,
+          status: "applied",
+          appliedAt:
+            new Date().toISOString()
+        };
+
+        const createdApplication =
+          await createApplication(
+            newApplication,
+            token
+          );
+
+        setApplications([
+          createdApplication,
+          ...applications
+        ]);
+
+        setSelectedJob(null);
+
+      } catch (error) {
+
+        console.log(error);
+
+        alert(
+          "Failed to submit application"
+        );
+      }
     };
-
-    setApplications([
-      newApplication,
-      ...applications
-    ]);
-
-    const existing =
-      JSON.parse(localStorage.getItem("notifications")) || [];
-
-    const newNotification = {
-      id: Date.now(),
-      message: `Application submitted for ${selectedJob.title}`,
-      time: new Date().toLocaleString(),
-      status: "applied",
-      read: false
-    };
-
-    localStorage.setItem(
-      "notifications",
-      JSON.stringify([newNotification, ...existing])
-    );
-
-    setSelectedJob(null);
-  };
 
   // STATUS CHANGE
-  const handleStatusChange = (
-    jobId,
-    newStatus
-  ) => {
+  const handleStatusChange =
+    async (
+      applicationId,
+      newStatus
+    ) => {
 
-    const updated = applications.map((app) => {
+      try {
 
-      if (app.jobId === jobId) {
-       
-      // CREATE INTERVIEW DATE
-      let interviewDate = app.interviewDate;
+        let interviewDate =
+          null;
 
-      if (
-        newStatus === "interview" &&
-        !app.interviewDate
-      ) {
+        if (
+          newStatus ===
+          "interview"
+        ) {
 
-        const date = new Date();
+          const date =
+            new Date();
 
-        // ADD 3 DAYS
-        date.setDate(date.getDate() + 3);
+          date.setDate(
+            date.getDate() + 3
+          );
 
-        // SET TIME
-        date.setHours(10);
-        date.setMinutes(0);
+          date.setHours(10);
+          date.setMinutes(0);
 
-        interviewDate = date.toISOString();
+          interviewDate =
+            date.toISOString();
+        }
+
+        const updatedApplication =
+          await updateApplicationStatus(
+            applicationId,
+            {
+              status:
+                newStatus,
+              interviewDate
+            },
+            token
+          );
+
+        const updated =
+          applications.map(
+            (app) =>
+              app.id ===
+              applicationId
+                ? updatedApplication
+                : app
+          );
+
+        setApplications(updated);
+
+      } catch (error) {
+
+        console.log(error);
+
+        alert(
+          "Failed to update status"
+        );
       }
-
-      return {
-        ...app,
-        status: newStatus,
-        interviewDate
-      };
-    }
-
-    return app;
-  });
-
-    setApplications(updated);
-
-localStorage.setItem(
-  "applications",
-  JSON.stringify(updated)
-);
-
-    const existing =
-      JSON.parse(localStorage.getItem("notifications")) || [];
-
-    const changedApp = applications.find(
-      (a) => a.jobId === jobId
-    );
-
-    if (changedApp) {
-      const newNotification = {
-        id: Date.now(),
-        message: `Your application status changed to ${newStatus}`,
-        time: new Date().toLocaleString(),
-        status: newStatus,
-        read: false
-      };
-
-      localStorage.setItem(
-        "notifications",
-        JSON.stringify([newNotification, ...existing])
-      );
-    }
-  };
+    };
 
   // DELETE JOB
-  const handleDeleteJob = (id) => {
+  const handleDeleteJob =
+    async (id) => {
 
-    const filtered =
-      jobs.filter(
-        (job) => job.id !== id
-      );
+      try {
 
-    setJobs(filtered);
-  };
+        await deleteJob(
+          id,
+          token
+        );
+
+        const filtered =
+          jobs.filter(
+            (job) =>
+              job.id !== id
+          );
+
+        setJobs(filtered);
+
+      } catch (error) {
+
+        console.log(error);
+
+        alert(
+          "Failed to delete job"
+        );
+      }
+    };
 
   // EDIT JOB
-  const handleEditJob = (
-    id,
-    updatedData
-  ) => {
+  const handleEditJob =
+    async (
+      id,
+      updatedData
+    ) => {
 
-    const updated =
-      jobs.map((job) =>
-        job.id === id
-          ? {
-              ...job,
-              ...updatedData
-            }
-          : job
-      );
+      try {
 
-    setJobs(updated);
-  };
+        const updatedJob =
+          await editJob(
+            id,
+            updatedData,
+            token
+          );
 
+        const updated =
+          jobs.map((job) =>
+            job.id === id
+              ? updatedJob
+              : job
+          );
+
+        setJobs(updated);
+
+      } catch (error) {
+
+        console.log(error);
+
+        alert(
+          "Failed to edit job"
+        );
+      }
+    };
 
   // FILTER JOBS
-  const filteredJobs = useMemo(() => {
-    return jobs.filter((job) =>
-      job.title
-        .toLowerCase()
-        .includes(search.toLowerCase())
-    );
-  }, [jobs, search]);
+  const filteredJobs =
+    useMemo(() => {
+
+      return jobs.filter(
+        (job) =>
+          job.title
+            .toLowerCase()
+            .includes(
+              search.toLowerCase()
+            )
+      );
+
+    }, [jobs, search]);
 
   // STATS
-  const totalJobs = jobs.length;
-  const totalApps = applications.length;
+  const totalJobs =
+    jobs.length;
 
-  const interviews = applications.filter(
-    (a) => a.status === "interview"
-  ).length;
+  const totalApps =
+    applications.length;
 
-  const accepted = applications.filter(
-    (a) => a.status === "accepted"
-  ).length;
+  const interviews =
+    applications.filter(
+      (a) =>
+        a.status ===
+        "interview"
+    ).length;
+
+  const accepted =
+    applications.filter(
+      (a) =>
+        a.status ===
+        "accepted"
+    ).length;
 
   const applicationRate =
     totalJobs > 0
-      ? Math.round((totalApps / totalJobs) * 100)
+      ? Math.round(
+          (totalApps /
+            totalJobs) *
+            100
+        )
       : 0;
 
   const interviewRate =
     totalApps > 0
-      ? Math.round((interviews / totalApps) * 100)
+      ? Math.round(
+          (interviews /
+            totalApps) *
+            100
+        )
       : 0;
 
   const acceptedRate =
     totalApps > 0
-      ? Math.round((accepted / totalApps) * 100)
+      ? Math.round(
+          (accepted /
+            totalApps) *
+            100
+        )
       : 0;
 
   return (
+
     <div className="flex min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
 
-
-     {/* SIDEBAR */} 
-     <Sidebar />
+      {/* SIDEBAR */}
+      <Sidebar />
 
       {/* MAIN */}
       <div className="flex-1 p-4 md:p-6 overflow-hidden">
@@ -261,6 +354,7 @@ localStorage.setItem(
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-8">
 
           <div>
+
             <h1 className="text-3xl md:text-4xl font-bold">
               {isAdmin
                 ? "Recruiter Dashboard"
@@ -268,25 +362,32 @@ localStorage.setItem(
             </h1>
 
             <p className="text-slate-400 mt-2">
-              Welcome back, {user?.email}
+              Welcome back,
+              {" "}
+              {user?.email}
             </p>
+
           </div>
 
-          {/* RIGHT */}
-          <div className="flex items-center justify-end gap-2 ml-auto"></div>
-         
+          <div className="flex items-center gap-3">
+
             <NotificationBell
-              applications={applications}
+              applications={
+                applications
+              }
             />
 
             <button
-              onClick={handleLogout}
+              onClick={
+                handleLogout
+              }
               className="bg-red-500/20 border border-red-500/30 hover:bg-red-500 px-5 py-3 rounded-2xl transition font-medium"
             >
               Logout
             </button>
 
-          
+          </div>
+
         </div>
 
         {/* SEARCH */}
@@ -299,16 +400,19 @@ localStorage.setItem(
               placeholder="Search jobs..."
               value={search}
               onChange={(e) =>
-                setSearch(e.target.value)
+                setSearch(
+                  e.target.value
+                )
               }
               className="flex-1 bg-white/10 border border-white/10 rounded-2xl px-5 py-4 text-white placeholder-gray-400 outline-none"
             />
 
-            {/* POST BUTTON */}
             {isAdmin && (
               <button
                 onClick={() =>
-                  setIsModalOpen(true)
+                  setIsModalOpen(
+                    true
+                  )
                 }
                 className="bg-blue-600 hover:bg-blue-700 px-6 py-4 rounded-2xl font-semibold transition whitespace-nowrap"
               >
@@ -317,136 +421,172 @@ localStorage.setItem(
             )}
 
           </div>
+
         </div>
 
-      {user?.role === "admin" && (
+        {/* ADMIN */}
+        {isAdmin && (
 
-  <>
-     
-        {/* STAT CARDS */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mb-8">
-          
-          
+          <>
+            {/* STATS */}
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mb-8">
 
-          {/* TOTAL JOBS */}
-          <div className="bg-white/10 backdrop-blur-xl border border-white/10 rounded-3xl p-5 shadow-xl">
-            <div className="flex justify-between items-center mb-4">
-              <div className="bg-blue-500/20 p-3 rounded-2xl">
-                <Briefcase className="text-blue-400" />
+              {/* JOBS */}
+              <div className="bg-white/10 backdrop-blur-xl border border-white/10 rounded-3xl p-5 shadow-xl">
+
+                <div className="flex justify-between items-center mb-4">
+
+                  <div className="bg-blue-500/20 p-3 rounded-2xl">
+                    <Briefcase className="text-blue-400" />
+                  </div>
+
+                  <span className="text-green-400 text-sm flex items-center gap-1">
+                    <TrendingUp size={14} />
+                    +12%
+                  </span>
+
+                </div>
+
+                <h2 className="text-slate-400 text-sm">
+                  Total Jobs
+                </h2>
+
+                <p className="text-3xl font-bold mt-1">
+                  {totalJobs}
+                </p>
+
               </div>
 
-              <span className="text-green-400 text-sm flex items-center gap-1">
-                <TrendingUp size={14} />
-                +12%
-              </span>
-            </div>
+              {/* APPLICATIONS */}
+              <div className="bg-white/10 backdrop-blur-xl border border-white/10 rounded-3xl p-5 shadow-xl">
 
-            <h2 className="text-slate-400 text-sm">
-              Total Jobs
-            </h2>
+                <div className="flex justify-between items-center mb-4">
 
-            <p className="text-3xl font-bold mt-1">
-              {totalJobs}
-            </p>
-          </div>
+                  <div className="bg-purple-500/20 p-3 rounded-2xl">
+                    <FileText className="text-purple-400" />
+                  </div>
 
+                  <span className="text-green-400 text-sm">
+                    {applicationRate}%
+                  </span>
 
-          {/* APPLICATIONS */}
-          <div className="bg-white/10 backdrop-blur-xl border border-white/10 rounded-3xl p-5 shadow-xl">
-            <div className="flex justify-between items-center mb-4">
-              <div className="bg-purple-500/20 p-3 rounded-2xl">
-                <FileText className="text-purple-400" />
+                </div>
+
+                <h2 className="text-slate-400 text-sm">
+                  Applications
+                </h2>
+
+                <p className="text-3xl font-bold mt-1">
+                  {totalApps}
+                </p>
+
               </div>
 
-              <span className="text-green-400 text-sm">
-                {applicationRate}%
-              </span>
-            </div>
+              {/* INTERVIEWS */}
+              <div className="bg-white/10 backdrop-blur-xl border border-white/10 rounded-3xl p-5 shadow-xl">
 
-            <h2 className="text-slate-400 text-sm">
-              Applications
-            </h2>
+                <div className="flex justify-between items-center mb-4">
 
-            <p className="text-3xl font-bold mt-1">
-              {totalApps}
-            </p>
-          </div>
+                  <div className="bg-yellow-500/20 p-3 rounded-2xl">
+                    <Users className="text-yellow-400" />
+                  </div>
 
-          {/* INTERVIEWS */}
-          <div className="bg-white/10 backdrop-blur-xl border border-white/10 rounded-3xl p-5 shadow-xl">
-            <div className="flex justify-between items-center mb-4">
-              <div className="bg-yellow-500/20 p-3 rounded-2xl">
-                <Users className="text-yellow-400" />
+                  <span className="text-green-400 text-sm">
+                    {interviewRate}%
+                  </span>
+
+                </div>
+
+                <h2 className="text-slate-400 text-sm">
+                  Interviews
+                </h2>
+
+                <p className="text-3xl font-bold mt-1">
+                  {interviews}
+                </p>
+
               </div>
 
-              <span className="text-green-400 text-sm">
-                {interviewRate}%
-              </span>
-            </div>
+              {/* ACCEPTED */}
+              <div className="bg-white/10 backdrop-blur-xl border border-white/10 rounded-3xl p-5 shadow-xl">
 
-            <h2 className="text-slate-400 text-sm">
-              Interviews
-            </h2>
+                <div className="flex justify-between items-center mb-4">
 
-            <p className="text-3xl font-bold mt-1">
-              {interviews}
-            </p>
-          </div>
+                  <div className="bg-green-500/20 p-3 rounded-2xl">
+                    <CheckCircle className="text-green-400" />
+                  </div>
 
-          {/* ACCEPTED */}
-          <div className="bg-white/10 backdrop-blur-xl border border-white/10 rounded-3xl p-5 shadow-xl">
-            <div className="flex justify-between items-center mb-4">
-              <div className="bg-green-500/20 p-3 rounded-2xl">
-                <CheckCircle className="text-green-400" />
+                  <span className="text-green-400 text-sm">
+                    {acceptedRate}%
+                  </span>
+
+                </div>
+
+                <h2 className="text-slate-400 text-sm">
+                  Accepted
+                </h2>
+
+                <p className="text-3xl font-bold mt-1">
+                  {accepted}
+                </p>
+
               </div>
 
-              <span className="text-green-400 text-sm">
-                {acceptedRate}%
-              </span>
             </div>
 
-            <h2 className="text-slate-400 text-sm">
-              Accepted
-            </h2>
+            {/* CHARTS */}
+            <div className="mb-8">
+              <Charts
+                applications={
+                  applications
+                }
+              />
+            </div>
 
-            <p className="text-3xl font-bold mt-1">
-              {accepted}
-            </p>
-          </div>
-        </div>
-
-        {/* CHARTS */}
-        <div className="mb-8">
-          <Charts applications={applications} />
-        </div>
-
-      </>
-
-)}
+          </>
+        )}
 
         {/* JOBS */}
         <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6">
 
-          {filteredJobs.map((job) => (
-            <JobCard
-              key={job.id}
-              job={job}
-              isAdmin={isAdmin}
-              applications={applications}
-              onApply={() =>
-                handleApplyClick(job)
-              }
-              onStatusChange={handleStatusChange}
-              onDelete={handleDeleteJob}
-              onEdit={handleEditJob}   
-            />
-          ))}
+          {filteredJobs.map(
+            (job) => (
+
+              <JobCard
+                key={job.id}
+                job={job}
+                isAdmin={
+                  isAdmin
+                }
+                applications={
+                  applications
+                }
+                onApply={() =>
+                  handleApplyClick(
+                    job
+                  )
+                }
+                onStatusChange={
+                  handleStatusChange
+                }
+                onDelete={
+                  handleDeleteJob
+                }
+                onEdit={
+                  handleEditJob
+                }
+              />
+
+            )
+          )}
 
         </div>
 
         {/* EMPTY */}
         {filteredJobs.length === 0 && (
+
           <div className="bg-white/10 border border-white/10 rounded-3xl p-10 text-center mt-10">
+
             <h2 className="text-xl font-semibold mb-2">
               No jobs found
             </h2>
@@ -454,33 +594,45 @@ localStorage.setItem(
             <p className="text-slate-400">
               Try searching for another role
             </p>
+
           </div>
+
         )}
 
       </div>
 
       {/* APPLY MODAL */}
       <ApplyModal
-        isOpen={!!selectedJob}
+        isOpen={
+          !!selectedJob
+        }
         job={selectedJob}
         onClose={() =>
-          setSelectedJob(null)
+          setSelectedJob(
+            null
+          )
         }
-        onSubmit={handleSubmitApplication}
+        onSubmit={
+          handleSubmitApplication
+        }
       />
 
       {/* POST JOB MODAL */}
       <PostJobModal
-        isOpen={isModalOpen}
-        onClose={() =>
-          setIsModalOpen(false)
+        isOpen={
+          isModalOpen
         }
-        onAddJob={handleAddJob}
- />
-
- 
-
+        onClose={() =>
+          setIsModalOpen(
+            false
+          )
+        }
+        onAddJob={
+          handleAddJob
+        }
+      />
 
     </div>
   );
 }
+

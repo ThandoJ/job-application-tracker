@@ -1,5 +1,7 @@
+
 import supabase from "../config/supabase.js";
 
+// GET ALL JOBS
 export const getJobs = async (req, res) => {
   try {
 
@@ -11,39 +13,66 @@ export const getJobs = async (req, res) => {
       });
 
     if (error) {
-      return res.status(500).json(error);
+      console.log(error);
+
+      return res.status(500).json({
+        message: error.message
+      });
     }
 
     res.json(data);
 
   } catch (error) {
+
+    console.log(error);
+
     res.status(500).json({
       message: error.message
     });
   }
 };
 
+// CREATE JOB
 export const createJob = async (req, res) => {
   try {
 
+    console.log("Creating job:", req.body);
+
     const { data, error } = await supabase
       .from("jobs")
-      .insert([req.body])
+      .insert([
+        {
+          title: req.body.title,
+          company: req.body.company,
+          location: req.body.location,
+          description: req.body.description,
+          createdAt: new Date().toISOString()
+        }
+      ])
       .select();
 
     if (error) {
-      return res.status(500).json(error);
+
+      console.log(error);
+
+      return res.status(500).json({
+        message: error.message
+      });
     }
 
     res.status(201).json(data[0]);
 
   } catch (error) {
+
+    console.log(error);
+
     res.status(500).json({
       message: error.message
     });
   }
 };
 
+// DELETE JOB
 export const deleteJob = async (req, res) => {
   try {
 
@@ -55,7 +84,12 @@ export const deleteJob = async (req, res) => {
       .eq("id", id);
 
     if (error) {
-      return res.status(500).json(error);
+
+      console.log(error);
+
+      return res.status(500).json({
+        message: error.message
+      });
     }
 
     res.json({
@@ -63,12 +97,16 @@ export const deleteJob = async (req, res) => {
     });
 
   } catch (error) {
+
+    console.log(error);
+
     res.status(500).json({
       message: error.message
     });
   }
 };
 
+// EDIT JOB
 export const editJob = async (req, res) => {
   try {
 
@@ -81,14 +119,23 @@ export const editJob = async (req, res) => {
       .select();
 
     if (error) {
-      return res.status(500).json(error);
+
+      console.log(error);
+
+      return res.status(500).json({
+        message: error.message
+      });
     }
 
     res.json(data[0]);
 
   } catch (error) {
+
+    console.log(error);
+
     res.status(500).json({
       message: error.message
     });
   }
 };
+

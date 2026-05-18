@@ -163,10 +163,13 @@ export default function JobCard({
 
       if (!newTitle) return;
 
-      onEdit({
+      onEdit(
+        job.id,
+        {
         ...job,
         title: newTitle
-      });
+      }
+    );
     }}
 
      className=" flex-1 bg-blue-600/30 border border-blue-500/30 hover:bg-blue-500 px-4 py-2 rounded-xl transition font-medium"
