@@ -9,6 +9,7 @@ export default function PostJobModal({
   const [company, setCompany] = useState("");
   const [location, setLocation] = useState("");
   const [description, setDescription] = useState("");
+  const [interviewLocation, setInterviewLocation] = useState("");
 
   if (!isOpen) return null;
 
@@ -19,6 +20,7 @@ export default function PostJobModal({
       company,
       location,
       description,
+      interviewLocation,
       createdAt: new Date().toISOString()
     };
 
@@ -61,6 +63,18 @@ export default function PostJobModal({
             className="w-full p-3 border rounded-xl"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
+          />
+
+          <input
+            type="text"
+            placeholder="Interview Location"
+            className="w-full p-3 border rounded-xl"
+            value={interviewLocation}
+            onChange={(e) =>
+              setInterviewLocation(
+                e.target.value
+              )
+            }
           />
 
           <textarea

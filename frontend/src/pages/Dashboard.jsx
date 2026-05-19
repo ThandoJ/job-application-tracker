@@ -115,6 +115,7 @@ export default function Dashboard({
           jobId: selectedJob.id,
           jobTitle: selectedJob.title,
           company: selectedJob.company,
+          interviewLocation: selectedJob.interviewLocation,
           email: currentUser?.email,
           name: formData.name,
           surname: formData.surname,
@@ -151,67 +152,81 @@ export default function Dashboard({
     };
 
   // STATUS CHANGE
-  const handleStatusChange =
-    async (
-      applicationId,
-      newStatus
-    ) => {
+// STATUS CHANGE
+const handleStatusChange =
+  async (
+    applicationId,
+    newStatus
+  ) => {
 
-      try {
+    try {
 
-        let interviewDate =
-          null;
+      let interviewDate =
+        null;
 
-        if (
-          newStatus ===
-          "interview"
-        ) {
+      // INTERVIEW STATUS
+      if (
+        newStatus ===
+        "interview"
+      ) {
 
-          const date =
-            new Date();
-
-          date.setDate(
-            date.getDate() + 3
-          );
-
-          date.setHours(10);
-          date.setMinutes(0);
-
-          interviewDate =
-            date.toISOString();
-        }
-
-        const updatedApplication =
-          await updateApplicationStatus(
-            applicationId,
-            {
-              status:
-                newStatus,
-              interviewDate
-            },
-            token
-          );
-
-        const updated =
-          applications.map(
-            (app) =>
-              app.id ===
-              applicationId
-                ? updatedApplication
-                : app
-          );
-
-        setApplications(updated);
-
-      } catch (error) {
-
-        console.log(error);
-
-        alert(
-          "Failed to update status"
+        const customDate = prompt(
+          "Enter interview date & time\nExample: 2026-06-10 10:00"
         );
+
+        if (!customDate) return;
+
+        interviewDate =
+          new Date(
+            customDate
+          ).toISOString();
       }
-    };
+
+      // FIND CURRENT APPLICATION
+      const currentApplication =
+        applications.find(
+          (a) =>
+            a.id ===
+            applicationId
+        );
+
+      // UPDATE APPLICATION
+      const updatedApplication =
+        await updateApplicationStatus(
+          applicationId,
+          {
+            status:
+              newStatus,
+
+            interviewDate,
+
+            interviewLocation:
+              currentApplication?.interviewLocation
+          },
+          token
+        );
+
+      // UPDATE FRONTEND STATE
+      const updated =
+        applications.map(
+          (app) =>
+            app.id ===
+            applicationId
+              ? updatedApplication
+              : app
+        );
+
+      setApplications(updated);
+
+    } catch (error) {
+
+      console.log(error);
+
+      alert(
+        "Failed to update status"
+      );
+    }
+  };
 
   // DELETE JOB
   const handleDeleteJob =

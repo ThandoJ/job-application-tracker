@@ -1,4 +1,5 @@
 import supabase from "../config/supabase.js";
+import { sendStatusEmail } from "../utils/sendEmail.js";
 
 // GET APPLICATIONS
 export const getApplications =
@@ -82,6 +83,17 @@ export const updateApplicationStatus = async (req, res) => {
           .status(500)
           .json(error);
       }
+
+  
+await sendStatusEmail({
+  to: data[0].email,
+  name: data[0].name,
+  jobTitle: data[0].jobTitle,
+  company: data[0].company,
+  status,
+  interviewDate,
+  location: data[0].company
+});
 
       res.json(data[0]);
 
