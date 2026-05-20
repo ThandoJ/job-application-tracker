@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { loginUser } from "../api/authApi";
 
 
-export default function Login() {
+export default function Login({setUser}) {
 
   const navigate = useNavigate();
 
@@ -41,9 +41,9 @@ export default function Login() {
           ); 
           
           localStorage.setItem(
-            "user", JSON.stringify(data.user)
-          );
+            "user", JSON.stringify(data.user));
           
+          setUser(data.user);
           navigate("/intro"); 
         } catch (error) { 
 

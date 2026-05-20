@@ -61,6 +61,7 @@ export const createApplication =
     }
 };
 
+
 // UPDATE STATUS
 export const updateApplicationStatus = async (req, res) => {
   try {
@@ -106,3 +107,20 @@ await sendStatusEmail({
     }
 };
 
+// DELETE APPLICATION
+export const deleteApplication = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const { error } = await supabase
+      .from("applications")
+      .delete()
+      .eq("id", id);
+
+    if (error) return res.status(500).json(error);
+
+    res.json({ message: "Application deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

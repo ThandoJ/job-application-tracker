@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import CVPreviewModal from "../components/CVPreviewModal";
 
+import { deleteApplication } from "../api/applicationApi";
+
 import {
   Search,
   Filter,
@@ -11,91 +13,70 @@ import {
   Clock3,
   CheckCircle2,
   XCircle,
-  BriefcaseBusiness
+  BriefcaseBusiness,
+  Trash2
 } from "lucide-react";
 
 export default function Applications({
   jobs = [],
-  applications = []
+  applications = [],
+  setApplications
 }) {
   const navigate = useNavigate();
 
   const user = JSON.parse(localStorage.getItem("user"));
   const isAdmin = user?.role === "admin";
 
-
-
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] =
-    useState("all");
-
-  const [selectedCV, setSelectedCV] =
-    useState(null);
-
-  const [selectedFileName, setSelectedFileName] =
-    useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [selectedCV, setSelectedCV] = useState(null);
+  const [selectedFileName, setSelectedFileName] = useState("");
 
   if (!user) {
     navigate("/");
     return null;
   }
 
+  // DELETE HANDLER (ADMIN ONLY)
+  const handleDelete = async (id) => {
+    if (!confirm("Delete this application?")) return;
+    try {
+      await deleteApplication(id);
+      setApplications(applications.filter((app) => app.id !== id));
+    } catch (error) {
+      console.log(error);
+      alert("Failed to delete application");
+    }
+  };
+
   // FILTER APPLICATIONS
   let filtered = isAdmin
     ? applications
-    : applications.filter(
-        (app) => app.email === user.email
-      );
+    : applications.filter((app) => app.email === user.email);
 
   // SEARCH
   filtered = filtered.filter((app) => {
-    const job = jobs.find(
-      (j) => j.id === app.jobId
-    );
-
+    const job = jobs.find((j) => j.id === app.jobId);
     return (
-      job?.title
-        ?.toLowerCase()
-        .includes(search.toLowerCase()) ||
-      app.name
-        ?.toLowerCase()
-        .includes(search.toLowerCase())
+      job?.title?.toLowerCase().includes(search.toLowerCase()) ||
+      app.name?.toLowerCase().includes(search.toLowerCase())
     );
   });
 
   // STATUS FILTER
   if (statusFilter !== "all") {
-    filtered = filtered.filter(
-      (app) => app.status === statusFilter
-    );
+    filtered = filtered.filter((app) => app.status === statusFilter);
   }
 
   // STATUS ICON
   const getStatusIcon = (status) => {
     switch (status) {
       case "accepted":
-        return (
-          <CheckCircle2
-            size={16}
-            className="text-green-400"
-          />
-        );
-
+        return <CheckCircle2 size={16} className="text-green-400" />;
       case "rejected":
-        return (
-          <XCircle
-            size={16}
-            className="text-red-400"
-          />
-        );
-
+        return <XCircle size={16} className="text-red-400" />;
       default:
-        return (
-          <Clock3
-            size={16}
-            className="text-blue-400"
-          />
-        );
+        return <Clock3 size={16} className="text-blue-400" />;
     }
   };
 
@@ -104,16 +85,12 @@ export default function Applications({
     switch (status) {
       case "accepted":
         return "bg-green-500/20 text-green-400 border-green-500/20";
-
       case "rejected":
         return "bg-red-500/20 text-red-400 border-red-500/20";
-
       case "interview":
         return "bg-purple-500/20 text-purple-400 border-purple-500/20";
-
       case "reviewing":
         return "bg-yellow-500/20 text-yellow-400 border-yellow-500/20";
-
       default:
         return "bg-blue-500/20 text-blue-400 border-blue-500/20";
     }
@@ -138,9 +115,7 @@ export default function Applications({
 
             <div>
               <h1 className="text-3xl md:text-4xl font-bold">
-                {isAdmin
-                  ? "All Applications"
-                  : "My Applications"}
+                {isAdmin ? "All Applications" : "My Applications"}
               </h1>
 
               <p className="text-gray-400 mt-2">
@@ -150,13 +125,8 @@ export default function Applications({
 
             {/* TOTAL */}
             <div className="bg-white/10 backdrop-blur-xl border border-white/10 rounded-3xl px-6 py-4 shadow-xl">
-              <p className="text-sm text-gray-400">
-                Total Applications
-              </p>
-
-              <h2 className="text-3xl font-bold mt-1">
-                {filtered.length}
-              </h2>
+              <p className="text-sm text-gray-400">Total Applications</p>
+              <h2 className="text-3xl font-bold mt-1">{filtered.length}</h2>
             </div>
 
           </div>
@@ -166,79 +136,30 @@ export default function Applications({
 
             {/* SEARCH */}
             <div className="flex items-center gap-3 bg-white/10 backdrop-blur-xl border border-white/10 rounded-2xl px-4 py-3">
-
-              <Search
-                size={20}
-                className="text-gray-400"
-              />
-
+              <Search size={20} className="text-gray-400" />
               <input
                 type="text"
                 placeholder="Search applications..."
                 className="bg-transparent outline-none w-full text-white placeholder:text-gray-500"
                 value={search}
-                onChange={(e) =>
-                  setSearch(e.target.value)
-                }
+                onChange={(e) => setSearch(e.target.value)}
               />
             </div>
 
             {/* FILTER */}
             <div className="flex items-center gap-3 bg-white/10 backdrop-blur-xl border border-white/10 rounded-2xl px-4">
-
-              <Filter
-                size={18}
-                className="text-gray-400"
-              />
-
+              <Filter size={18} className="text-gray-400" />
               <select
                 className="bg-transparent w-full py-3 outline-none text-white"
                 value={statusFilter}
-                onChange={(e) =>
-                  setStatusFilter(e.target.value)
-                }
+                onChange={(e) => setStatusFilter(e.target.value)}
               >
-                <option
-                  value="all"
-                  className="bg-[#111827]"
-                >
-                  All
-                </option>
-
-                <option
-                  value="applied"
-                  className="bg-[#111827]"
-                >
-                  Applied
-                </option>
-
-                <option
-                  value="reviewing"
-                  className="bg-[#111827]"
-                >
-                  Reviewing
-                </option>
-
-                <option
-                  value="interview"
-                  className="bg-[#111827]"
-                >
-                  Interview
-                </option>
-
-                <option
-                  value="accepted"
-                  className="bg-[#111827]"
-                >
-                  Accepted
-                </option>
-
-                <option
-                  value="rejected"
-                  className="bg-[#111827]"
-                >
-                  Rejected
-                </option>
+                <option value="all" className="bg-[#111827]">All</option>
+                <option value="applied" className="bg-[#111827]">Applied</option>
+                <option value="reviewing" className="bg-[#111827]">Reviewing</option>
+                <option value="interview" className="bg-[#111827]">Interview</option>
+                <option value="accepted" className="bg-[#111827]">Accepted</option>
+                <option value="rejected" className="bg-[#111827]">Rejected</option>
               </select>
             </div>
 
@@ -247,27 +168,15 @@ export default function Applications({
           {/* EMPTY STATE */}
           {filtered.length === 0 ? (
             <div className="bg-white/10 backdrop-blur-xl border border-white/10 rounded-3xl p-12 text-center">
-
-              <BriefcaseBusiness
-                size={50}
-                className="mx-auto text-gray-500 mb-4"
-              />
-
-              <h2 className="text-2xl font-semibold">
-                No Applications Found
-              </h2>
-
-              <p className="text-gray-400 mt-2">
-                Try changing your filters or search
-              </p>
+              <BriefcaseBusiness size={50} className="mx-auto text-gray-500 mb-4" />
+              <h2 className="text-2xl font-semibold">No Applications Found</h2>
+              <p className="text-gray-400 mt-2">Try changing your filters or search</p>
             </div>
           ) : (
             <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
 
               {filtered.map((app, index) => {
-                const job = jobs.find(
-                  (j) => j.id === app.jobId
-                );
+                const job = jobs.find((j) => j.id === app.jobId);
 
                 return (
                   <div
@@ -286,78 +195,59 @@ export default function Applications({
                       </h2>
 
                       {/* COMPANY */}
-                      <p className="text-gray-400 mt-1">
-                        {job?.company}
-                      </p>
+                      <p className="text-gray-400 mt-1">{job?.company}</p>
 
                       {/* ADMIN INFO */}
                       {isAdmin && (
                         <div className="mt-4 bg-white/5 border border-white/5 rounded-2xl p-4">
-
                           <p className="font-medium text-white">
                             {app.name} {app.surname}
                           </p>
-
-                          <p className="text-sm text-gray-400 mt-1">
-                            {app.email}
-                          </p>
-
-                          <p className="text-sm text-gray-400">
-                            {app.phone}
-                          </p>
+                          <p className="text-sm text-gray-400 mt-1">{app.email}</p>
+                          <p className="text-sm text-gray-400">{app.phone}</p>
                         </div>
                       )}
 
                       {/* CV */}
                       <div className="mt-5">
-
                         {app.cvBase64 ? (
                           <button
                             onClick={() => {
-                              setSelectedCV(
-                                app.cvBase64
-                              );
-
-                              setSelectedFileName(
-                                app.cv
-                              );
+                              setSelectedCV(app.cvBase64);
+                              setSelectedFileName(app.cv);
                             }}
                             className="flex items-center gap-2 text-blue-400 hover:text-blue-300 transition"
                           >
                             <FileText size={18} />
-
-                            <span className="underline">
-                              View CV
-                            </span>
+                            <span className="underline">View CV</span>
                           </button>
                         ) : (
-                          <p className="text-red-400 text-sm">
-                            No CV uploaded
-                          </p>
+                          <p className="text-red-400 text-sm">No CV uploaded</p>
                         )}
                       </div>
 
                       {/* STATUS */}
                       <div className="mt-5 flex items-center justify-between">
-
-                        <div
-                          className={`flex items-center gap-2 px-3 py-2 rounded-2xl border text-sm ${getStatusStyle(
-                            app.status
-                          )}`}
-                        >
+                        <div className={`flex items-center gap-2 px-3 py-2 rounded-2xl border text-sm ${getStatusStyle(app.status)}`}>
                           {getStatusIcon(app.status)}
-
-                          <span className="capitalize">
-                            {app.status}
-                          </span>
+                          <span className="capitalize">{app.status}</span>
                         </div>
 
                         <span className="text-xs text-gray-500">
-                          {new Date(
-                            app.appliedAt
-                          ).toLocaleDateString()}
+                          {new Date(app.appliedAt).toLocaleDateString()}
                         </span>
                       </div>
+
+                      {/* DELETE - ADMIN ONLY */}
+                      {isAdmin && (
+                        <button
+                          onClick={() => handleDelete(app.id)}
+                          className="mt-4 w-full flex items-center justify-center gap-2 bg-red-500/20 hover:bg-red-500 border border-red-500/30 text-red-400 hover:text-white py-2 rounded-2xl transition-all duration-300"
+                        >
+                          <Trash2 size={16} />
+                          Delete Application
+                        </button>
+                      )}
 
                     </div>
                   </div>

@@ -1,4 +1,6 @@
 import Sidebar from "../components/Sidebar";
+import { deleteApplication } from "../api/applicationApi"; 
+import { Trash2 } from "lucide-react"; 
 
 import {
   CalendarDays,
@@ -10,7 +12,8 @@ import {
 
 export default function Interviews({
   applications = [],
-  jobs = []
+  jobs = [],
+setApplications
 }) {
   const user = JSON.parse(localStorage.getItem("user"));
 
@@ -29,6 +32,20 @@ export default function Interviews({
       app.status === "interview"
     );
   });
+
+
+
+  // ADD DELETE HANDLER
+  const handleDelete = async (id) => {
+    if (!confirm("Delete this interview?")) return;
+    try {
+      await deleteApplication(id);
+      setApplications(applications.filter((app) => app.id !== id));
+    } catch (error) {
+      console.log(error);
+      alert("Failed to delete interview");
+    }
+  };
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
@@ -179,6 +196,17 @@ export default function Interviews({
                       </p>
 
                     </div>
+
+                    {/* DELETE - ADMIN ONLY */}
+{isAdmin && (
+  <button
+    onClick={() => handleDelete(app.id)}
+    className="mt-4 w-full flex items-center justify-center gap-2 bg-red-500/20 hover:bg-red-500 border border-red-500/30 text-red-400 hover:text-white py-2 rounded-2xl transition-all duration-300"
+  >
+    <Trash2 size={16} />
+    Delete Interview
+  </button>
+)}
 
                   </div>
 

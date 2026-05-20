@@ -38,3 +38,8 @@ export const updateApplicationStatus =
 
     return response.data;
   };
+
+  export const deleteApplication = async (id) => {
+  const response = await axios.delete(`${API}/${id}`);
+  return response.data;
+};

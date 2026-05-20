@@ -32,7 +32,8 @@ export default function Dashboard({
   jobs = [],
   setJobs,
   applications = [],
-  setApplications
+  setApplications,
+  setUser
 }) {
 
   const navigate = useNavigate();
@@ -59,6 +60,8 @@ export default function Dashboard({
 
     localStorage.removeItem("user");
     localStorage.removeItem("token");
+    setUser(null);
+    
 
     navigate("/");
   };
