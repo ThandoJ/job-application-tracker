@@ -11,6 +11,7 @@ import Profile from "./pages/Profile";
 import Chats from "./components/Chats";
 import Interviews from "./pages/Interviews";
 import Intro from "./pages/Intro";
+import Landing from "./pages/Landing";
 
 
 
@@ -81,9 +82,15 @@ export default function App() {
 
     <Routes>
 
+        {/* LANDING */}
+        <Route
+  path="/"
+  element={<Landing />}
+/>
+
       {/* LOGIN */}
       <Route
-        path="/"
+        path="/login"
         element={<Login />}
       />
  
