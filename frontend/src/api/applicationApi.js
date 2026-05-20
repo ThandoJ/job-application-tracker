@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API =
-  "http://localhost:5000/api/applications";
+  "https://job-application-tracker-3-nrlr.onrender.com/api/applications";
 
 // GET APPLICATIONS
 export const fetchApplications =

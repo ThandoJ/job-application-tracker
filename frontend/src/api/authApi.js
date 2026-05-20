@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API =
-  "http://localhost:5000/api/auth";
+  "https://job-application-tracker-3-nrlr.onrender.com/api/auth";
 
 // REGISTER
 export const registerUser = async (userData) => {
